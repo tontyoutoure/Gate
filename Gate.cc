@@ -158,12 +158,13 @@ void welcome()
 {
   GateMessage("Core", 0, G4endl);
   GateMessage("Core", 0, "*******************************************************" << G4endl);
-  GateMessage("Core", 0, " GATE version 9.3 (2023)" << G4endl);
+  GateMessage("Core", 0, " GATE version 9.4 (2024)" << G4endl);
   GateMessage("Core", 0, " Copyright : OpenGATE Collaboration" << G4endl);
   GateMessage("Core", 0, " Reference : Phys. Med. Biol. 49(19) 4543-4561     2004 " << G4endl);
   GateMessage("Core", 0, " Reference : Phys. Med. Biol. 56(4)  881-901       2011 " << G4endl);
   GateMessage("Core", 0, " Reference : Med. Phys.       41(6)  1-14          2014" << G4endl);
   GateMessage("Core", 0, " Reference : Phys. Med. Biol. 66(10) 1-23          2021" << G4endl);
+  GateMessage("Core", 0, " Reference : Frontiers in Physics, 12              2024" << G4endl);
   GateMessage("Core", 0, " http://www.opengatecollaboration.org " << G4endl);
   GateMessage("Core", 0, "*******************************************************" << G4endl);
 #ifdef GATE_USE_GPU

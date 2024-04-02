@@ -67,9 +67,6 @@ ELSE()
 ENDIF()
 set(CMAKE_CXX_STANDARD ${Geant4_CXX_STANDARD})
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 #=========================================================
 # Refuse to build with MT geant4, allow dev override
 IF(Geant4_multithreaded_FOUND)
@@ -315,15 +312,14 @@ MESSAGE("Your current Geant4 version is ${Geant4_VERSION}")
 
 #=========================================================
 # Display message about this version
-MESSAGE("IMPORTANT! This version of GATE (9.3) is version of passage for new digitizer.")
+MESSAGE("IMPORTANT! This version of GATE (9.4) has still some traces of passage for new digitizer.")
 MESSAGE("Please, be aware that some of functionalities are NOT YET re-implemented: ")
 MESSAGE("- Coincidence digitizer modules (combining of several Coincidence Sorters)")
-MESSAGE("- Compton Camera digitizer modules and output")
 MESSAGE("- Output: Sinogram, Ecat7, LMF")
 MESSAGE("- ARF may work not properly yet")
 MESSAGE("We apologize for this inconvenience and kindly ask for your patience.")
-MESSAGE("This functionalities will be added during 2023.")
-MESSAGE("Meanwhile, please, use Gate 9.2")
+MESSAGE("This functionalities will be added during 2024.")
+MESSAGE("Meanwhile, please, use Gate 9.3")
 
 
 
