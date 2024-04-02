@@ -49,6 +49,7 @@ jobs:
                                   make \
                                   binutils \
                                   libx11-dev \
+                                  libtbb-dev \
                                   libxpm-dev \
                                   libxft-dev \
                                   libxext-dev \
@@ -95,6 +96,7 @@ jobs:
                        -Dpython=OFF \
                        -Dpyroot=OFF \
                        -Dclad=OFF \
+                       -Dxrootd=OFF \
                        -DCMAKE_INSTALL_PREFIX=$HOME/software/root/install
           make -j4 install
           cd ..
@@ -250,6 +252,21 @@ jobs:
             exit 1
           fi
         fi
+
+#  ssh_session:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Checkout github repo
+#      uses: actions/checkout@v3
+#      with:
+#          lfs: true
+#    - name: Checkout LFS objects
+#      run: git lfs checkout
+#    - name: Start SSH session
+#      uses: luchihoratiu/debug-via-ssh@main
+#      with:
+#        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+#        SSH_PASS: ${{ secrets.SSH_PASS }}
 
   benchmarks:
     runs-on: ubuntu-latest
