@@ -1,6 +1,6 @@
 .. _installation_guide-label:
 
-Installation Guide V9.2
+Installation Guide V9.4
 =======================
 
 .. contents:: Table of Contents
@@ -41,11 +41,6 @@ With Docker
 
 See :ref:`docker_gate-label`
 
-
-With Singularity
-~~~~~~~~~~~~~~~~
-
-To be written
 
 Via virtual machine
 ~~~~~~~~~~~~~~~~~~~
