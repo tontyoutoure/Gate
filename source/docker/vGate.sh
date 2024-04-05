@@ -101,7 +101,7 @@ echo 'source /home/vgate/Software/Geant4/install/bin/geant4.sh' >> /home/vgate/.
 cd
 cd Software/Gate
 mkdir src bin
-git clone -b v9.3 https://github.com/OpenGATE/Gate.git src
+git clone -b v9.4 https://github.com/OpenGATE/Gate.git src
 cd bin
 ccmake ../src -DGATE_USE_RTK=ON -DGATE_USE_TORCH=ON -DTorch_DIR=/home/vgate/Software/libtorch/share/cmake/Torch -DGATE_COMPILE_GATEDIGIT=ON
 make
