@@ -193,13 +193,21 @@ GateToTree::GateToTree(const G4String &name, GateOutputMgr *outputMgr, DigiMode 
 
     m_messenger = new GateToTreeMessenger(this);
     m_hits_enabled = false;
+    m_hitsCommonOutput_enabled = false;
+
+
+
+
 }
 
 void GateToTree::RecordBeginOfAcquisition() {
+	 if (m_hits_enabled && m_hitsCommonOutput_enabled)
+	        GateError("Commands /hits/ and /hitsCommonOutput/ cannot be enabled at the same time");
+
     if (!this->IsEnabled())
         return;
 
-   /* if (m_hits_enabled) {
+    if (m_hitsCommonOutput_enabled) {
         for (auto &&fileName: m_listOfFileName) {
             auto extension = getExtension(fileName);
             auto name = removeExtension(fileName);
@@ -207,7 +215,8 @@ void GateToTree::RecordBeginOfAcquisition() {
             G4String hits_filename = name + ".hits." + extension;
             m_manager_hits.add_file(hits_filename, extension);
         }
-        */
+    }
+
         //OK GND 2022
 	for (auto &&m: m_mmanager_hits)
 	{
@@ -691,9 +700,15 @@ void GateToTree::RecordEndOfAcquisition() {
     //m_manager_optical.close();
 
 	//OK GND 2022
-
+	if(m_hitsCommonOutput_enabled)
+		{
+		m_manager_hits.close();
+		}
+	else
+	{
 	for (auto &&m: m_mmanager_hits)
             	m.second.close();
+	}
 
 	for (auto &&m: m_mmanager_optical)
 	            	m.second.close();
@@ -719,9 +734,10 @@ void GateToTree::RecordBeginOfEvent(const G4Event *event) {
 }
 
 void GateToTree::RecordEndOfEvent(const G4Event *event) {
+	auto fDM = G4DigiManager::GetDMpointer();
 
 	//OK GND 2022
-	auto fDM = G4DigiManager::GetDMpointer();
+
 
 	 if (!m_hits_to_collectionID.size()) {
 	        for (auto &&m: m_mmanager_hits) {
@@ -829,12 +845,19 @@ void GateToTree::RecordEndOfEvent(const G4Event *event) {
 				m_energyIniT=hit->GetEnergyIniTrack();
 			}
 
+			if(m_hitsCommonOutput_enabled)
+				{
+				m_manager_hits.fill();
+				}
+			else
+			{
 			 m.second.fill();
-			//m_manager_hits.fill();
-		}
-	 }
-    //auto fDM = G4DigiManager::GetDMpointer();
+			}
 
+		}
+	}
+    //auto fDM = G4DigiManager::GetDMpointer();
+	//}
     if (!m_singles_to_collectionID.size()) {
         for (auto &&m: m_mmanager_singles) {
            // auto collectionID = fDM->GetDigiCollectionID(m.first);
@@ -1083,6 +1106,15 @@ void GateToTree::setHitsEnabled(G4bool mHitsEnabled) {
 
 }
 
+G4bool GateToTree::getHitsCommonOutputEnabled() const {
+    return m_hitsCommonOutput_enabled;
+}
+
+void GateToTree::setHitsCommonOutputEnabled(G4bool mHitsCommonOutputEnabled) {
+    m_hitsCommonOutput_enabled = mHitsCommonOutputEnabled;
+}
+
+
 //OK GND 2022
 void GateToTree::addHitsCollection(const std::string &str) {
 	GateDigitizerMgr* digitizerMgr = GateDigitizerMgr::GetInstance();
@@ -1104,6 +1136,7 @@ void GateToTree::addHitsCollection(const std::string &str) {
                 	 n_fileName = name + ".hits." + extension;
                 else
                 	 n_fileName = name + ".hits_" + str + "." + extension;
+                if(!m_hitsCommonOutput_enabled)
                 m.add_file(n_fileName, extension);
 
             }

@@ -41,6 +41,10 @@ private:
   G4UIcmdWithoutParameter *m_enableHitsOutput;
   G4UIcmdWithoutParameter *m_disableHitsOutput;
 
+  G4UIcmdWithoutParameter *m_enableHitsCommonOutput;
+  G4UIcmdWithoutParameter *m_disableHitsCommonOutput;
+
+
   G4UIcmdWithoutParameter *m_enableOpticalDataOutput;
   G4UIcmdWithoutParameter *m_disableOpticalDataOutput;
 
