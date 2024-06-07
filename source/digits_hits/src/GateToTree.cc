@@ -215,6 +215,155 @@ void GateToTree::RecordBeginOfAcquisition() {
             G4String hits_filename = name + ".hits." + extension;
             m_manager_hits.add_file(hits_filename, extension);
         }
+        if (m_hitsParams_to_write.at("PDGEncoding").toSave())
+                   m_manager_hits.write_variable("PDGEncoding", &m_PDGEncoding);
+
+               if (m_hitsParams_to_write.at("trackID").toSave())
+                   m_manager_hits.write_variable("trackID", &m_trackID);
+
+               if (m_hitsParams_to_write.at("parentID").toSave())
+                   m_manager_hits.write_variable("parentID", &m_parentID);
+
+               if (m_hitsParams_to_write.at("trackLocalTime").toSave())
+                   m_manager_hits.write_variable("trackLocalTime", &m_trackLocalTime);
+
+               if (m_hitsParams_to_write.at("time").toSave())
+                   m_manager_hits.write_variable("time", &m_time[0]);
+
+               if (m_hitsParams_to_write.at("runID").toSave())
+                   m_manager_hits.write_variable("runID", &m_runID);
+
+               if (m_hitsParams_to_write.at("eventID").toSave())
+                   m_manager_hits.write_variable("eventID", &m_eventID[0]);
+
+               if (m_hitsParams_to_write.at("sourceID").toSave())
+                   m_manager_hits.write_variable("sourceID", &m_sourceID[0]);
+
+               if (m_hitsParams_to_write.at("primaryID").toSave())
+                   m_manager_hits.write_variable("primaryID", &m_primaryID);
+
+               if (m_hitsParams_to_write.at("posX").toSave())
+                   m_manager_hits.write_variable("posX", &m_posX[0]);
+
+               if (m_hitsParams_to_write.at("posY").toSave())
+                   m_manager_hits.write_variable("posY", &m_posY[0]);
+
+               if (m_hitsParams_to_write.at("posZ").toSave())
+                   m_manager_hits.write_variable("posZ", &m_posZ[0]);
+
+               if (m_hitsParams_to_write.at("localPosX").toSave())
+                   m_manager_hits.write_variable("localPosX", &m_localPosX);
+
+               if (m_hitsParams_to_write.at("localPosY").toSave())
+                   m_manager_hits.write_variable("localPosY", &m_localPosY);
+
+               if (m_hitsParams_to_write.at("localPosZ").toSave())
+                   m_manager_hits.write_variable("localPosZ", &m_localPosZ);
+
+               if (m_hitsParams_to_write.at("momDirX").toSave())
+                   m_manager_hits.write_variable("momDirX", &m_momDirX);
+
+               if (m_hitsParams_to_write.at("momDirY").toSave())
+                   m_manager_hits.write_variable("momDirY", &m_momDirY);
+
+               if (m_hitsParams_to_write.at("momDirZ").toSave())
+                   m_manager_hits.write_variable("momDirZ", &m_momDirZ);
+
+               if (m_hitsParams_to_write.at("edep").toSave())
+                   m_manager_hits.write_variable("edep", &m_edep[0]);
+
+               if (m_hitsParams_to_write.at("stepLength").toSave())
+                   m_manager_hits.write_variable("stepLength", &m_stepLength);
+
+               if (m_hitsParams_to_write.at("trackLength").toSave())
+                   m_manager_hits.write_variable("trackLength", &m_trackLength);
+
+               if (m_hitsParams_to_write.at("rotationAngle").toSave())
+                   m_manager_hits.write_variable("rotationAngle", &m_rotationAngle);
+
+               if (m_hitsParams_to_write.at("axialPos").toSave())
+                   m_manager_hits.write_variable("axialPos", &m_axialPos);
+
+               if (m_hitsParams_to_write.at("processName").toSave())
+                   m_manager_hits.write_variable("processName", &m_processName, MAX_NB_CHARACTER);
+
+               if (m_hitsParams_to_write.at("comptVolName").toSave())
+                   m_manager_hits.write_variable("comptVolName", &m_comptonVolumeName[0], MAX_NB_CHARACTER);
+
+               if (m_hitsParams_to_write.at("RayleighVolName").toSave())
+                   m_manager_hits.write_variable("RayleighVolName", &m_RayleighVolumeName[0], MAX_NB_CHARACTER);
+
+               if (m_hitsParams_to_write.at("volumeIDs").toSave()) {
+                   for (auto i = 0; i < VOLUMEID_SIZE; ++i) {
+                       std::stringstream ss;
+                       ss << "volumeID[" << i << "]";
+                       m_manager_hits.write_variable(ss.str(), &m_volumeID[i]);
+                   }
+               }
+
+               if (m_hitsParams_to_write.at("sourcePosX").toSave())
+                   m_manager_hits.write_variable("sourcePosX", &m_sourcePosX[0]);
+               if (m_hitsParams_to_write.at("sourcePosY").toSave())
+                   m_manager_hits.write_variable("sourcePosY", &m_sourcePosY[0]);
+               if (m_hitsParams_to_write.at("sourcePosZ").toSave())
+                   m_manager_hits.write_variable("sourcePosZ", &m_sourcePosZ[0]);
+
+               if (m_hitsParams_to_write.at("nPhantomCompton").toSave())
+                   m_manager_hits.write_variable("nPhantomCompton", &m_nPhantomCompton[0]);
+
+               if (m_hitsParams_to_write.at("nCrystalCompton").toSave())
+                   m_manager_hits.write_variable("nCrystalCompton", &m_nCrystalCompton[0]);
+
+               if (m_hitsParams_to_write.at("nPhantomRayleigh").toSave())
+                   m_manager_hits.write_variable("nPhantomRayleigh", &m_nPhantomRayleigh[0]);
+
+               if (m_hitsParams_to_write.at("nCrystalRayleigh").toSave())
+                   m_manager_hits.write_variable("nCrystalRayleigh", &m_nCrystalRayleigh[0]);
+
+
+               if (m_hitsParams_to_write.at("componentsIDs").toSave()) {
+
+                   if (GateSystemListManager::GetInstance()->size() == 1) {
+                       int k = 0;
+                       for (auto depth = 0; depth < m_max_depth_system[k]; ++depth) {
+                           std::stringstream ss;
+                           ss << m_outputIDName[k][depth];
+                           m_manager_hits.write_variable(ss.str(), &m_outputID[0][k][depth]);
+                       }
+                   } else {
+                       for (unsigned int k = 0; k < GateSystemListManager::GetInstance()->size(); ++k) {
+                           auto system = GateSystemListManager::GetInstance()->GetSystem(k);
+
+                           for (auto depth = 0; depth < m_max_depth_system[k]; ++depth) {
+                               if (!m_outputIDHasName[k][depth])
+                                   continue;
+                               std::stringstream ss;
+                               ss << system->GetOwnName() << "/" << m_outputIDName[k][depth];
+                               m_manager_hits.write_variable(ss.str(), &m_outputID[0][k][depth]);
+                           }
+                       }
+                   }
+               }
+
+               if (m_hitsParams_to_write.at("photonID").toSave())
+                   m_manager_hits.write_variable("photonID", &m_photonID);
+
+               if (m_hitsParams_to_write.at("systemID").toSave() && GateSystemListManager::GetInstance()->size() > 1)
+                   m_manager_hits.write_variable("systemID", &m_systemID);
+
+               if (m_hitsParams_to_write.at("sourceType").toSave())
+                   m_manager_hits.write_variable("sourceType", &m_sourceType);
+
+               if (m_hitsParams_to_write.at("decayType").toSave())
+                   m_manager_hits.write_variable("decayType", &m_decayType);
+
+               if (m_hitsParams_to_write.at("gammaType").toSave())
+                   m_manager_hits.write_variable("gammaType", &m_gammaType);
+
+
+               m_manager_hits.write_header();
+
+
     }
 
         //OK GND 2022
@@ -1117,6 +1266,7 @@ void GateToTree::setHitsCommonOutputEnabled(G4bool mHitsCommonOutputEnabled) {
 
 //OK GND 2022
 void GateToTree::addHitsCollection(const std::string &str) {
+
 	GateDigitizerMgr* digitizerMgr = GateDigitizerMgr::GetInstance();
 
     G4String possibleValues = "";
@@ -1136,8 +1286,8 @@ void GateToTree::addHitsCollection(const std::string &str) {
                 	 n_fileName = name + ".hits." + extension;
                 else
                 	 n_fileName = name + ".hits_" + str + "." + extension;
-                if(!m_hitsCommonOutput_enabled)
-                m.add_file(n_fileName, extension);
+                if(m_hits_enabled)
+                	m.add_file(n_fileName, extension);
 
             }
             m_mmanager_hits.emplace(str, std::move(m));
