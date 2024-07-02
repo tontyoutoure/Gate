@@ -225,7 +225,7 @@ Five types of distribution are available in GATE, namely:
 *  Gaussian distributions, defined by a mean value and a standard deviation. 
 *  Exponential distributions, defined by its power. 
 *  Manual distributions, defined by a discrete set of points specified in the GATE macro file. The data are linearly interpolated to define the function in a continuous range. 
-*  File distribution, acting as the manual distribution, but where the points are defined in a separate ASCII file, whose name is given as a parameter. This method is appropriate for large numbers of points and allows to describe any distribution in a totally generic way. Additionally, GATE supports reading 2D distributions from ASCII files where values are organized in matrices.
+*  File distribution, acting as the manual distribution, but where the points are defined in a separate ASCII file, whose name is given as a parameter. This method is appropriate for large numbers of points and allows to describe any distribution in a totally generic way. Now, GATE supports reading 2D distributions from ASCII files where values are organized in matrices.
 
 A distribution is declared by specifying its name then by creating a new instance, with its type name::
 
