@@ -529,13 +529,15 @@ BEWARE: This relocation procedure is validated only for the first group level of
 This approach is particularly essential  for  monolithic crystal detectors, where factors like edge effects and interaction positions significantly influence spatial  resolution.
 Here is an example of how to configure this in a macro file:
 
-**Example**::
+**Example for 2D distribution**::
 
 
   /gate/distributions/name    my_distrib2D
   /gate/distributions/insert   File
   /gate/distributions/my_distrib2D/setFileName    Lut(X,Y).txt
   /gate/distributions/my_distrib2D/readMatrix2d
+
+**Example for 2D distribution**::
 
   /gate/distributions/name   my_distrib1D
   /gate/distributions/insert  File
