@@ -225,7 +225,7 @@ Five types of distribution are available in GATE, namely:
 *  Gaussian distributions, defined by a mean value and a standard deviation. 
 *  Exponential distributions, defined by its power. 
 *  Manual distributions, defined by a discrete set of points specified in the GATE macro file. The data are linearly interpolated to define the function in a continuous range. 
-*  File distribution, acting as the manual distribution, but where the points are defined in a separate ASCII file, whose name is given as a parameter. This method is appropriate for large numbers of points and allows to describe any distribution in a totally generic way.
+*  File distribution, acting as the manual distribution, but where the points are defined in a separate ASCII file, whose name is given as a parameter. This method is appropriate for large numbers of points and allows to describe any distribution in a totally generic way. Additionally, GATE supports reading 2D distributions from ASCII files where values are organized in matrices.
 
 A distribution is declared by specifying its name then by creating a new instance, with its type name::
 
@@ -297,7 +297,8 @@ The possible type name available corresponds to the five distributions described
    +----------------+--------------------------------------------------------------------------------+
    | read           | do read the file (should be called after specifying all the other parameters)  | 
    +----------------+--------------------------------------------------------------------------------+
-
+   | ReadMatrix2d   | do read a data file that organizes its contents in a 2D matrix format          | 
+   +----------------+--------------------------------------------------------------------------------+ 
 
 Singles Digitizers
 -------------------
@@ -518,11 +519,52 @@ In case if the position obtained after applying a Gaussian blurring exceeds the 
 BEWARE: This relocation procedure is validated only for the first group level of crystals.
 
 **Example**::
- 
+
    /gate/digitizerMgr/crystal/SinglesDigitizer/Singles/insert   spatialResolution
    /gate/digitizerMgr/crystal/SinglesDigitizer/Singles/spatialResolution/fwhm 1.0 mm
    /gate/digitizerMgr/crystal/SinglesDigitizer/Singles/spatialResolution/confineInsideOfSmallestElement true 
-   
+
+**Configuring Spatial Resolution with 1D and 2D Distributions**::
+
+This approach is particularly essential  for  monolithic crystal detectors, where factors like edge effects and interaction positions significantly influence spatial  resolution.
+Here is an example of how to configure this in a macro file:
+
+**Example**::
+
+
+  /gate/distributions/name    my_distrib2D
+  /gate/distributions/insert   File
+  /gate/distributions/my_distrib2D/setFileName    Lut(X,Y).txt
+  /gate/distributions/my_distrib2D/readMatrix2d
+
+  /gate/distributions/name   my_distrib1D
+  /gate/distributions/insert  File
+  /gate/distributions/my_distrib1D/setFileName  macros/LutY.txt
+  /gate/distributions/my_distrib1D/read
+
+
+Configure the spatial resolution for the digitizer using these distributions::
+
+/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
+/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmXdistrib2D my_distrib2D
+/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmYdistrib my_distrib1D
+/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/confineInsideOfSmallestElement true
+
+These commands allow for more precise control over the spatial resolution by using predefined distributions for the X and Y axes.
+
+BEWARE : The file for 2D Distribution  should be structured such that:
+
+-The first line contains the x values.
+
+-Each subsequent line begins with a y value followed by the standard deviation (stddev) values corresponding to each x value and y value pair.
+
+**Example**::
+
+-29.50 -28.50 -27.50 
+-29.50 9.62 13.66 10.22
+-28.50 11.38 11.18 10.23
+-27.50 12.82 10.43 9.70
+
 Energy Framing
 ^^^^^^^^^^^^^^
 *Previously Thresholder and Upholder*
