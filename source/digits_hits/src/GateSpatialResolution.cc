@@ -1,4 +1,5 @@
 
+
 /*----------------------
   Copyright (C): OpenGATE Collaboration
 
@@ -21,9 +22,10 @@
   - modified by Adrien Paillet 11/2022
   	  This blurring has been validated up to a given FWHM of 10mm.
   	  At higher FWHM, the number of "relocated" digis is no longer negligible. The blurring effect is then so compensated that resolution will improve compared to lower values of FWHM.
-
+-modified by Radia Oudihat 06/2024
+        Added support for 1D and 2D FWHM distributions for X and Y, and applied Gaussian blurring.
+        Implemented logic to determine standard deviations (stddevX, stddevY) based on defined 1D and 2D FWHM distributions for the X and Y axes.
 */
-
 #include "GateSpatialResolution.hh"
 #include "GateSpatialResolutionMessenger.hh"
 #include "GateDigi.hh"
@@ -31,7 +33,6 @@
 #include "GateDigitizerMgr.hh"
 #include "GateObjectStore.hh"
 #include "GateConstants.hh"
-
 
 #include "G4SystemOfUnits.hh"
 #include "G4EventManager.hh"
@@ -42,11 +43,18 @@
 #include "G4UnitsTable.hh"
 #include "G4TransportationManager.hh"
 #include "G4Navigator.hh"
+#include "GateVDistribution.hh"
+
+
+
 
 GateSpatialResolution::GateSpatialResolution(GateSinglesDigitizer *digitizer, G4String name)
   :GateVDigitizerModule(name,"digitizerMgr/"+digitizer->GetSD()->GetName()+"/SinglesDigitizer/"+digitizer->m_digitizerName+"/"+name,digitizer,digitizer->GetSD()),
    m_fwhm(0),
    m_fwhmX(0),
+   m_fwhmXdistrib(0),
+   m_fwhmYdistrib(0),
+   m_fwhmXYdistrib2D(0),
    m_fwhmY(0),
    m_fwhmZ(0),
    m_IsConfined(true),
@@ -70,28 +78,65 @@ GateSpatialResolution::~GateSpatialResolution()
 }
 
 
-void GateSpatialResolution::Digitize()
+void GateSpatialResolution::Digitize(){
+
+if (m_fwhm != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmZ != 0 || m_fwhmXYdistrib2D != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0))
 {
-	if( m_fwhm!=0 && (m_fwhmX!=0 || m_fwhmY!=0 || m_fwhmZ!=0 ) )
-		{
-			GateError("***ERROR*** Spatial Resolution is ambiguous: you can set unique /fwhm for 3 axis OR set /fhwmX, /fhwmY, /fhwmZ!");
-		}
+    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set a unique FWHM for all 3 axes OR set FWHM for X, Y, Z individually.");
+}
+
+
+if (m_fwhmXYdistrib2D != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0))
+{
+    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM 2D  distribution for (X,Y) OR set FWHM for X ,Y individually  .");
+}
+
+
+if (m_fwhmY != 0 && (m_fwhmYdistrib != 0))
+{
+    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for Y OR set FWHM for Y distribution.");
+}
+
+// Check if the spatial resolutions FWHM for the X axis are defined ambiguously
+if (m_fwhmX != 0 && (m_fwhmXdistrib != 0))
+{
+    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for X OR set FWHM for X distribution.");
+}
+
 
 	G4double fwhmX;
 	G4double fwhmY;
 	G4double fwhmZ;
+
+	if (m_fwhmX == 0 && m_fwhmY == 0 && m_fwhmZ == 0)
+	{
+	    fwhmX = m_fwhm;
+	    fwhmY = m_fwhm;
+	    fwhmZ = m_fwhm;
+	}
+	else
+	{
+	    fwhmX = m_fwhmX;
+	    fwhmY = m_fwhmY;
+	    fwhmZ = m_fwhmZ;
+	}
+
 
 	if (m_fwhmX==0 && m_fwhmY==0 && m_fwhmZ==0 )
 	{
 		fwhmX=m_fwhm;
 		fwhmY=m_fwhm;
 		fwhmZ=m_fwhm;
+
 	}
 	else
 	{
 		fwhmX=m_fwhmX;
 		fwhmY=m_fwhmY;
 		fwhmZ=m_fwhmZ;
+
+
+
 	}
 
 
@@ -139,11 +184,44 @@ void GateSpatialResolution::Digitize()
 		  G4double Px = P.x();
 		  G4double Py = P.y();
 		  G4double Pz = P.z();
-		  G4double PxNew = G4RandGauss::shoot(Px,fwhmX/GateConstants::fwhm_to_sigma);
-		  G4double PyNew = G4RandGauss::shoot(Py,fwhmY/GateConstants::fwhm_to_sigma);
-		  G4double PzNew = G4RandGauss::shoot(Pz,fwhmZ/GateConstants::fwhm_to_sigma); //TC
+		  G4double stddevX, stddevY, stddevZ;
+		  if (m_fwhmXYdistrib2D) {
+		      // If the 2D FWHM distribution for X and Y is defined
 
+		    	 stddevX = m_fwhmXYdistrib2D->Value2D(P.x() * mm, P.y() * mm);
+		          stddevY = stddevX;  // Assuming the 2D distribution returns the same for both axes
+		      }
+		 else if (m_fwhmXdistrib) {
+		      // If the FWHM distribution for X is defined
+		      if (m_fwhmYdistrib) {
+		          stddevX = m_fwhmXdistrib->Value(P.x() * mm);
+		          stddevY = m_fwhmYdistrib->Value(P.y() * mm);
+		      } else if (m_fwhmY) {
+		          stddevX = m_fwhmXdistrib->Value(P.x() * mm);
+		          stddevY = fwhmY / GateConstants::fwhm_to_sigma;
+		      }
+		      else {
+		          stddevX = m_fwhmXdistrib->Value(P.x() * mm);
+		          stddevY = fwhmY / GateConstants::fwhm_to_sigma;
+		      }
+		  } else if (m_fwhmYdistrib) {
+		      // If the FWHM distribution for Y is defined
+		     if (m_fwhmX) {
+		          stddevX = fwhmX / GateConstants::fwhm_to_sigma;
+		          stddevY = m_fwhmYdistrib->Value(P.y() * mm);
+		      } else if (m_fwhmXdistrib) {
+		          stddevX = m_fwhmXdistrib->Value(P.y() * mm);
+		          stddevY = m_fwhmYdistrib->Value(P.y() * mm);
+		      }
+		  } else {
+		      // If neither the FWHM distributions for X nor Y are defined
+		      stddevX = fwhmX / GateConstants::fwhm_to_sigma;
+		      stddevY = fwhmY / GateConstants::fwhm_to_sigma;
+		  }
 
+		  G4double PxNew = G4RandGauss::shoot(Px,stddevX);
+		  G4double PyNew = G4RandGauss::shoot(Py,stddevY);
+		  G4double PzNew = G4RandGauss::shoot(Pz,fwhmZ/GateConstants::fwhm_to_sigma);
 		  if (m_IsConfined)
 		  {
 			  //set the position on the border of the crystal
@@ -151,18 +229,22 @@ void GateSpatialResolution::Digitize()
 			inputDigi->GetVolumeID().GetBottomCreator()->GetLogicalVolume()->GetSolid()->CalculateExtent(kXAxis, limits, at, Xmin, Xmax);
 			inputDigi->GetVolumeID().GetBottomCreator()->GetLogicalVolume()->GetSolid()->CalculateExtent(kYAxis, limits, at, Ymin, Ymax);
 			inputDigi->GetVolumeID().GetBottomCreator()->GetLogicalVolume()->GetSolid()->CalculateExtent(kZAxis, limits, at, Zmin, Zmax);
+
 			if(PxNew<Xmin) PxNew=Xmin;
 			if(PyNew<Ymin) PyNew=Ymin;
 			if(PzNew<Zmin) PzNew=Zmin;
 			if(PxNew>Xmax) PxNew=Xmax;
 			if(PyNew>Ymax) PyNew=Ymax;
 			if(PzNew>Zmax) PzNew=Zmax;
-			//
+
+
+
 			m_outputDigi->SetLocalPos(G4ThreeVector(PxNew,PyNew,PzNew)); //TC
 			m_outputDigi->SetGlobalPos(m_outputDigi->GetVolumeID().MoveToAncestorVolumeFrame(m_outputDigi->GetLocalPos())); //TC
-			//TC outputPulse->SetGlobalPos(G4ThreeVector(PxNew,PyNew,PzNew));
+			//TC
+			//outputPulse->SetGlobalPos(G4ThreeVector(PxNew,PyNew,PzNew));
 			m_OutputDigiCollection->insert(m_outputDigi);
-
+			//G4cout<<"PxNew"<<PxNew<<Gateendl;
 		  }
 		  else
 		  {
@@ -180,13 +262,12 @@ void GateSpatialResolution::Digitize()
 			  if(PxNew>Xmax) PxNew=Xmax;
 			  if(PyNew>Ymax) PyNew=Ymax;
 			  if(PzNew>Zmax) PzNew=Zmax;
-			  //
-			  m_outputDigi->SetLocalPos(G4ThreeVector(PxNew,PyNew,PzNew)); //TC
+			   m_outputDigi->SetLocalPos(G4ThreeVector(PxNew,PyNew,PzNew)); //TC
 			  m_outputDigi->SetGlobalPos(m_outputDigi->GetVolumeID().MoveToAncestorVolumeFrame(m_outputDigi->GetLocalPos())); //TC
 
 			 //Getting world Volume
 			  // Do not use from TransportationManager as it is not recommended
-			  G4Navigator *navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+			   G4Navigator *navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
 			  G4VPhysicalVolume *WorldVolume = navigator->GetWorldVolume();
 			  m_Navigator = new G4Navigator();
 			  m_Navigator->SetWorldVolume(WorldVolume);
@@ -206,7 +287,7 @@ void GateSpatialResolution::Digitize()
 		  }
 
 	  }
-    }
+	  }
   else
     {
   	  if (nVerboseLevel>1)
@@ -237,5 +318,4 @@ void GateSpatialResolution::DescribeMyself(size_t indent )
 	if(m_fwhm)
 	  G4cout << GateTools::Indent(indent) << "Spatial resolution : " << m_fwhm  << Gateendl;
 	else
-	  G4cout << GateTools::Indent(indent) << "Spatial resolution : " << m_fwhmX <<" "<< m_fwhmY<< " "<<m_fwhmZ<< Gateendl;
-}
+		G4cout << GateTools::Indent(indent) << "Spatial resolution : " << m_fwhmX <<" "<< m_fwhmY<< " "<<m_fwhmZ<< Gateendl;}
