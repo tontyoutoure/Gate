@@ -526,7 +526,7 @@ BEWARE: This relocation procedure is validated only for the first group level of
 
 **Configuring Spatial Resolution with 1D and 2D Distributions**::
 
-This approach is particularly essential  for  monolithic crystal detectors, where factors like edge effects and interaction positions significantly influence spatial  resolution.
+This approach is particularly essential  for  monolithic crystal detectors, where factors like edge effects and interaction positions significantly  may influence spatial  resolution.
 Here is an example of how to configure this in a macro file:
 
 **Example for 2D distribution**::
@@ -536,21 +536,20 @@ Here is an example of how to configure this in a macro file:
   /gate/distributions/insert   File
   /gate/distributions/my_distrib2D/setFileName    Lut(X,Y).txt
   /gate/distributions/my_distrib2D/readMatrix2d
-
-**Example for 2D distribution**::
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmXdistrib2D my_distrib2D
+**Example for 1D distribution**::
 
   /gate/distributions/name   my_distrib1D
   /gate/distributions/insert  File
   /gate/distributions/my_distrib1D/setFileName  macros/LutY.txt
   /gate/distributions/my_distrib1D/read
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmYdistrib my_distrib1D
 
 
-Configure the spatial resolution for the digitizer using these distributions::
 
-/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
-/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmXdistrib2D my_distrib2D
-/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmYdistrib my_distrib1D
-/gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/confineInsideOfSmallestElement true
+
 
 These commands allow for more precise control over the spatial resolution by using predefined distributions for the X and Y axes.
 
