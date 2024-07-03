@@ -27,6 +27,7 @@ See LICENSE.md for further details
 #include "GateClockDependentMessenger.hh"
 class GateSpatialResolution;
 class G4UIcmdWithAString;
+
 class GateSpatialResolutionMessenger : public GateClockDependentMessenger
 {
 public:
@@ -42,10 +43,6 @@ private:
 
   G4UIcmdWithADouble*  	spresolutionCmd;
   G4UIcmdWithADouble*   spresolutionXCmd;
-  G4UIcmdWithAString   *spresolutionXdistribCmd;
-  G4UIcmdWithAString   *spresolutionYdistribCmd;
-  G4UIcmdWithAString   *spresolutionXdistrib2DCmd;
-  G4UIcmdWithAString   *spresolutionYdistrib2DCmd;
   G4UIcmdWithADouble*   spresolutionYCmd;
   G4UIcmdWithADouble*   spresolutionZCmd;
   G4UIcmdWithABool* 	confineCmd;
