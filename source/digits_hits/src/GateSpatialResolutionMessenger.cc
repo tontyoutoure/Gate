@@ -52,11 +52,10 @@ GateSpatialResolutionMessenger::GateSpatialResolutionMessenger (GateSpatialResol
 	cmdName = GetDirectoryName() + "fwhmXYdistrib2D";
 	spresolutionXYdistrib2DCmd = new G4UIcmdWithAString(cmdName,this);
 	spresolutionXYdistrib2DCmd->SetGuidance("Set the distribution 2D of  spatial resolution in position for gaussian spblurring");
-	cmdName = GetDirectoryName() + "fwhmYdistrib2D";
 
-	confineCmd = new G4UIcmdWithABool(cmdName,this);
-	confineCmd->SetGuidance("To be set true, if you want to moves the outsiders of the crystal after spblurring inside the same crystal");
-
+	cmdName = GetDirectoryName() + "confineInsideOfSmallestElement";
+        confineCmd = new G4UIcmdWithABool(cmdName,this);
+        confineCmd->SetGuidance("To be set true, if you want to moves the outsiders of the crystal after spblurring inside the same crystal");
 }
 
 
