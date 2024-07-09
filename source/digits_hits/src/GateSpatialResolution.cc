@@ -62,6 +62,7 @@ GateSpatialResolution::GateSpatialResolution(GateSinglesDigitizer *digitizer, G4
    m_Touchable(0),
    m_systemDepth(-1),
    m_outputDigi(0),
+   m_IsFirstEntrance(1),
    m_OutputDigiCollection(0),
    m_digitizer(digitizer)
  {
@@ -76,32 +77,33 @@ GateSpatialResolution::~GateSpatialResolution()
   delete m_Messenger;
 
 }
+void GateSpatialResolution::SetSpatialResolutionParameters() {
+    // Check FWHM parameters
+    if (m_fwhm != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmZ != 0 || m_fwhmXYdistrib2D != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0)) {
+        G4cout << "***ERROR*** Spatial Resolution is ambiguous: you can set a unique FWHM for all 3 axes OR set FWHM for X, Y, Z individually." << G4endl;
+        abort();
+    }
 
+    if (m_fwhmXYdistrib2D != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0)) {
+        G4cout << "***ERROR*** Spatial Resolution is ambiguous: you can set FWHM 2D distribution for (X,Y) OR set FWHM for X, Y individually." << G4endl;
+        abort();
+    }
+
+    if (m_fwhmY != 0 && (m_fwhmYdistrib != 0)) {
+        G4cout << "***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for Y OR set FWHM for Y distribution." << G4endl;
+        abort();
+    }
+
+    if (m_fwhmX != 0 && (m_fwhmXdistrib != 0)) {
+        G4cout << "***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for X OR set FWHM for X distribution." << G4endl;
+        abort();
+    }}
 
 void GateSpatialResolution::Digitize(){
-
-if (m_fwhm != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmZ != 0 || m_fwhmXYdistrib2D != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0))
-{
-    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set a unique FWHM for all 3 axes OR set FWHM for X, Y, Z individually.");
-}
-
-
-if (m_fwhmXYdistrib2D != 0 && (m_fwhmX != 0 || m_fwhmY != 0 || m_fwhmXdistrib != 0 || m_fwhmYdistrib != 0))
-{
-    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM 2D  distribution for (X,Y) OR set FWHM for X ,Y individually  .");
-}
-
-
-if (m_fwhmY != 0 && (m_fwhmYdistrib != 0))
-{
-    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for Y OR set FWHM for Y distribution.");
-}
-
-// Check if the spatial resolutions FWHM for the X axis are defined ambiguously
-if (m_fwhmX != 0 && (m_fwhmXdistrib != 0))
-{
-    GateError("***ERROR*** Spatial Resolution is ambiguous: you can set FWHM for X OR set FWHM for X distribution.");
-}
+	  if (m_IsFirstEntrance) {
+		  SetSpatialResolutionParameters();
+	        m_IsFirstEntrance = false;
+	    }
 
 
 	G4double fwhmX;
@@ -222,7 +224,7 @@ if (m_fwhmX != 0 && (m_fwhmXdistrib != 0))
 		  G4double PxNew = G4RandGauss::shoot(Px,stddevX);
 		  G4double PyNew = G4RandGauss::shoot(Py,stddevY);
 		  G4double PzNew = G4RandGauss::shoot(Pz,fwhmZ/GateConstants::fwhm_to_sigma);
-		  if (m_IsConfined)
+	if (m_IsConfined)
 		  {
 			  //set the position on the border of the crystal
 			  //no need to update volume ID
@@ -309,8 +311,6 @@ void GateSpatialResolution::UpdateVolumeID()
 		G4int CopyNo = m_Touchable->GetReplicaNumber(m_systemDepth-1-i);
 		m_outputDigi->ChangeVolumeIDAndOutputVolumeIDValue(i,CopyNo);
 		}
-
-
 }
 
 void GateSpatialResolution::DescribeMyself(size_t indent )

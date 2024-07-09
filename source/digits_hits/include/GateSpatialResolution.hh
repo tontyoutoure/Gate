@@ -67,7 +67,7 @@ public:
     void SetFWHMx(G4double val)   { m_fwhmX = val;  }
     void SetFWHMy(G4double val)   { m_fwhmY = val;  }
     void SetFWHMz(G4double val)   { m_fwhmZ = val;  }
-
+    void SetSpatialResolutionParameters();
     inline void ConfineInsideOfSmallestElement(const G4bool& value) { m_IsConfined = value; };
     inline G4bool IsConfinedInsideOfSmallestElement() const  	      	{ return m_IsConfined; }
 
@@ -109,7 +109,7 @@ private:
   GateDigiCollection*  m_OutputDigiCollection;
 
   GateSinglesDigitizer *m_digitizer;
-
+  G4bool   m_IsFirstEntrance;
   G4VoxelLimits limits;
   G4double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
   G4AffineTransform at;
