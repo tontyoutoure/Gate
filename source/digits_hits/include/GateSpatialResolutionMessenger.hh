@@ -40,14 +40,13 @@ public:
 private:
   GateSpatialResolution* m_SpatialResolution;
 
-  G4UIcmdWithADouble*  	spresolutionCmd;
-  G4UIcmdWithADouble*   spresolutionXCmd;
+  G4UIcmdWithADoubleAndUnit*  	spresolutionCmd;
+  G4UIcmdWithADoubleAndUnit*   spresolutionXCmd;
+  G4UIcmdWithADoubleAndUnit*   spresolutionYCmd;
+  G4UIcmdWithADoubleAndUnit*   spresolutionZCmd;
   G4UIcmdWithAString   *spresolutionXdistribCmd;// Command declaration for 1D X-resolution distribution
   G4UIcmdWithAString   *spresolutionYdistribCmd;// Command declaration for 1D Y-resolution distribution
   G4UIcmdWithAString   *spresolutionXYdistrib2DCmd; // Command declaration for 2D XY-resolution distribution
-
-  G4UIcmdWithADouble*   spresolutionYCmd;
-  G4UIcmdWithADouble*   spresolutionZCmd;
   G4UIcmdWithABool* 	confineCmd;
 
 

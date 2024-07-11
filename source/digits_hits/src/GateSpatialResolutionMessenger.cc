@@ -11,10 +11,9 @@ See LICENSE.md for further details
 #include "GateSpatialResolutionMessenger.hh"
 #include "GateSpatialResolution.hh"
 #include "GateDigitizerMgr.hh"
-
 #include "G4SystemOfUnits.hh"
 #include "G4UIcmdWithADouble.hh"
-
+#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
@@ -31,18 +30,21 @@ GateSpatialResolutionMessenger::GateSpatialResolutionMessenger (GateSpatialResol
 	G4String cmdName;
 
 	cmdName = GetDirectoryName() + "fwhm";
-	spresolutionCmd = new G4UIcmdWithADouble(cmdName,this);
-	spresolutionCmd->SetGuidance("Set the resolution in position for gaussian spblurring");
+	spresolutionCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
+	spresolutionCmd->SetGuidance("Set the resolution (in mm) in position for gaussian spblurring");
+	spresolutionCmd->SetUnitCategory("Length");
 	cmdName = GetDirectoryName() + "fwhmX";
-	spresolutionXCmd= new G4UIcmdWithADouble(cmdName,this);
-	spresolutionXCmd->SetGuidance("Set the resolution ");
+	spresolutionXCmd= new G4UIcmdWithADoubleAndUnit(cmdName,this);
+	spresolutionXCmd->SetGuidance("Set the resolution (in mm) in position for gaussian spblurring");
+	spresolutionXCmd->SetUnitCategory("Length");
 	cmdName = GetDirectoryName() + "fwhmY";
-	spresolutionYCmd = new G4UIcmdWithADouble(cmdName,this);
+	spresolutionYCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
 	spresolutionYCmd->SetGuidance("Set the resolution in position for gaussian spblurring");
-
+	spresolutionYCmd->SetUnitCategory("Length");
 	cmdName = GetDirectoryName() + "fwhmZ";
-	spresolutionZCmd = new G4UIcmdWithADouble(cmdName,this);
+	spresolutionZCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
 	spresolutionZCmd->SetGuidance("Set the resolution in position for gaussian spblurring");
+	spresolutionZCmd->SetUnitCategory("Length");
 	cmdName = GetDirectoryName() + "fwhmXdistrib";
 	spresolutionXdistribCmd = new G4UIcmdWithAString(cmdName,this);
 	spresolutionXdistribCmd->SetGuidance("Set the distribution  resolution in position for gaussian spblurring");
@@ -54,8 +56,8 @@ GateSpatialResolutionMessenger::GateSpatialResolutionMessenger (GateSpatialResol
 	spresolutionXYdistrib2DCmd->SetGuidance("Set the distribution 2D of  spatial resolution in position for gaussian spblurring");
 
 	cmdName = GetDirectoryName() + "confineInsideOfSmallestElement";
-        confineCmd = new G4UIcmdWithABool(cmdName,this);
-        confineCmd->SetGuidance("To be set true, if you want to moves the outsiders of the crystal after spblurring inside the same crystal");
+    confineCmd = new G4UIcmdWithABool(cmdName,this);
+    confineCmd->SetGuidance("To be set true, if you want to moves the outsiders of the crystal after spblurring inside the same crystal");
 }
 
 
