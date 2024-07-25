@@ -22,4 +22,10 @@ cmake-build-*
 
 *.project
 
+*/.project
+
+
 .cache/
+
+
+.gitignore
