@@ -48,18 +48,10 @@ void GateCoincidenceMultiplesKiller::Digitize() {
 	m_OutputDigiCollection = new GateCoincidenceDigiCollection(GetName(),outputCollName); // to create the Digi Collection
 
 	G4DigiManager* DigiMan = G4DigiManager::GetDMpointer();
-
-	
-
-	GateDigitizerMgr* digitizerMgr = GateDigitizerMgr::GetInstance();
-	digitizerMgr->ShowSummary();
 	GateCoincidenceDigiCollection* IDC = 0;
 	IDC = (GateCoincidenceDigiCollection*) (DigiMan->GetDigiCollection(m_DCID));
-	G4cout<<IDC->GetName() << m_DCID<<G4endl;
+	
 	GateCoincidenceDigi* inputDigi = new GateCoincidenceDigi();
-
-	std::vector< GateCoincidenceDigi* >* OutputDigiCollectionVector = m_OutputDigiCollection->GetVector ();
-	std::vector<GateCoincidenceDigi*>::iterator iter;
 
 
 
