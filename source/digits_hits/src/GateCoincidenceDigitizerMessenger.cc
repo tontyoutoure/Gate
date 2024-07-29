@@ -27,6 +27,8 @@ See LICENSE.md for further details
 
 #include "GateCoincidenceDeadTime.hh"
 
+#include "GateCoincidenceMultiplesKiller.hh"
+
 /*#include "GateAdder.hh"
 #include "GateReadout.hh"
 #include "GateEnergyFraming.hh"
@@ -122,7 +124,7 @@ void GateCoincidenceDigitizerMessenger::SetNewValue(G4UIcommand* command,G4Strin
 
 const G4String& GateCoincidenceDigitizerMessenger::DumpMap()
 {
-   static G4String theList = "deadtime";//readout adder energyFraming timeResolution energyResolution spatialResolution efficiency deadtime pileup adderCompton opticaladder noise merger";
+   static G4String theList = "deadtime MultiplesKiller";//readout adder energyFraming timeResolution energyResolution spatialResolution efficiency deadtime pileup adderCompton opticaladder noise merger";
 
    return theList;
 }
@@ -146,6 +148,12 @@ void GateCoincidenceDigitizerMessenger::DoInsertion(const G4String& childTypeNam
   if (childTypeName=="deadtime")
     {
   	  newDM = new GateCoincidenceDeadTime(m_CoinDigitizer, DMname);
+  	  m_CoinDigitizer->AddNewModule(newDM);
+    }
+
+  else if (childTypeName=="MultiplesKiller")
+    {
+  	  newDM = new GateCoincidenceMultiplesKiller(m_CoinDigitizer, DMname);
   	  m_CoinDigitizer->AddNewModule(newDM);
     }
   /*else if (childTypeName=="readout")

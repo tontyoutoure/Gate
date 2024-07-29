@@ -98,8 +98,8 @@ void GateCoincidencePulseProcessorChainMessenger::DoInsertion(const G4String& ch
     newProcessor = new GateCoincidenceGeometrySelector(GetProcessorChain(),newInsertionName);
   else if (childTypeName=="buffer")
     newProcessor = new GateCoincidenceBuffer(GetProcessorChain(),newInsertionName);
-  else if (childTypeName=="multiplesKiller")
-    newProcessor = new GateCoincidenceMultiplesKiller(GetProcessorChain(),newInsertionName);
+  //else if (childTypeName=="multiplesKiller")
+    //newProcessor = new GateCoincidenceMultiplesKiller(GetProcessorChain(),newInsertionName);
   else if (childTypeName=="triCoincProcessor") //mhadi_add
      newProcessor = new GateTriCoincidenceSorter(GetProcessorChain(),newInsertionName);//mhadi_add
   else {
