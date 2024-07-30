@@ -9,6 +9,9 @@ See LICENSE.md for further details
 
 #include "GateCoincidencePulseProcessorChainMessenger.hh"
 
+//#include "../../digits_hits/include/GateCoincidenceBuffer.hh"
+//#include "../../digits_hits/include/GateCoincidenceMultiplesKiller.hh"
+#include "../../digits_hits/include/GateCoincidenceTimeDiffSelector.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithABool.hh"
@@ -16,11 +19,8 @@ See LICENSE.md for further details
 #include "GateVCoincidencePulseProcessor.hh"
 #include "GateCoincidencePulseProcessorChain.hh"
 
-#include "GateCoincidenceDeadTime.hh"
-#include "GateCoincidenceTimeDiffSelector.hh"
+//#include "GateCoincidenceDeadTime.hh"
 #include "GateCoincidenceGeometrySelector.hh"
-#include "GateCoincidenceBuffer.hh"
-#include "GateCoincidenceMultiplesKiller.hh"
 #include "GateTriCoincidenceSorter.hh" //mhadi_add
 #include "GateCCCoincidenceSequenceRecon.hh"//AE
 
@@ -96,8 +96,8 @@ void GateCoincidencePulseProcessorChainMessenger::DoInsertion(const G4String& ch
     newProcessor = new GateCoincidenceTimeDiffSelector(GetProcessorChain(),newInsertionName);
   else if (childTypeName=="geometrySelector")
     newProcessor = new GateCoincidenceGeometrySelector(GetProcessorChain(),newInsertionName);
-  else if (childTypeName=="buffer")
-    newProcessor = new GateCoincidenceBuffer(GetProcessorChain(),newInsertionName);
+ // else if (childTypeName=="buffer")
+   // newProcessor = new GateCoincidenceBuffer(GetProcessorChain(),newInsertionName);
   //else if (childTypeName=="multiplesKiller")
     //newProcessor = new GateCoincidenceMultiplesKiller(GetProcessorChain(),newInsertionName);
   else if (childTypeName=="triCoincProcessor") //mhadi_add

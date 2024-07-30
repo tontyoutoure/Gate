@@ -9,8 +9,11 @@ See LICENSE.md for further details
 
 #ifndef GateCoincidenceBufferMessenger_h
 #define GateCoincidenceBufferMessenger_h 1
+#include "G4UImessenger.hh"
+#include "globals.hh"
 
-#include "GatePulseProcessorMessenger.hh"
+#include "GateClockDependentMessenger.hh"
+//#include "GatePulseProcessorMessenger.hh"
 
 class G4UIdirectory;
 class G4UIcmdWithADoubleAndUnit;
@@ -21,14 +24,15 @@ class GateCoincidenceBuffer;
 class GateCoincidenceBufferMessenger: public GateClockDependentMessenger
 {
 public:
-  GateCoincidenceBufferMessenger(GateCoincidenceBuffer* itsBuffer);
+  GateCoincidenceBufferMessenger(GateCoincidenceBuffer*);
   virtual ~GateCoincidenceBufferMessenger();
 
   inline void SetNewValue(G4UIcommand* aCommand, G4String aString);
 
-  inline GateCoincidenceBuffer* GetBuffer(){ return (GateCoincidenceBuffer*) GetClockDependent(); }
+  //inline GateCoincidenceBuffer* GetBuffer(){ return (GateCoincidenceBuffer*) GetClockDependent(); }
 
 private:
+  GateCoincidenceBuffer* m_CoincidenceBuffer;
   G4UIcmdWithADoubleAndUnit *m_bufferSizeCmd; //!< set the dead time value
   G4UIcmdWithADoubleAndUnit *m_readFrequencyCmd;   //!< set the dead time mode
 //  G4UIcmdWithABool          *m_modifyTimeCmd;   //!< does buffer modify the time of pulses
