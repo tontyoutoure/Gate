@@ -30,6 +30,7 @@
 #include "GateSourceOfPromptGamma.hh"
 #include "GateSourcePhaseSpace.hh"
 #include "GateExtendedVSource.hh"
+#include "GateSourceTurbo.hh"
 
 //----------------------------------------------------------------------------------------
 GateSourceMgr* GateSourceMgr::mInstance = 0;
@@ -225,6 +226,11 @@ G4int GateSourceMgr::AddSource( std::vector<G4String> sourceVec )
       else if (sourceGeomType == "fastY90") {
         source = new GateSourceFastY90( sourceName );
         source->SetType("fastY90");
+        source->SetSourceID( m_sourceProgressiveNumber );
+      }
+      else if (sourceGeomType =="turbo") {
+        source = new GateSourceTurbo( sourceName );
+        source->SetType("turbo");
         source->SetSourceID( m_sourceProgressiveNumber );
       }
       else if (sourceGeomType == "") {
