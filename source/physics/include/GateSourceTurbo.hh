@@ -29,22 +29,14 @@ public:
 
   // should be reimplemented
   G4double GetNextTime(G4double timeStart) override;
-  void SetEdgePointTheta1(G4ThreeVector point) {
-    mPth1 = point;
-    m_PointSetFlag |= 0b0001;
-  };
-  void SetEdgePointTheta2(G4ThreeVector point) {
-    mPth2 = point;
-    m_PointSetFlag |= 0b0010;
-  };
-  void SetEdgePointPhi1(G4ThreeVector point) {
-    mPphi1 = point;
-    m_PointSetFlag |= 0b0100;
-  };
-  void SetEdgePointPhi2(G4ThreeVector point) {
-    mPphi2 = point;
-    m_PointSetFlag |= 0b1000;
-  };
+  void SetA1(G4double a) { a1 = a; };
+  void SetA2(G4double a) { a2 = a; };
+  void SetB1(G4double b) { b1 = b; };
+  void SetB2(G4double b) { b2 = b; };
+  void SetPlaneDistance(G4double distance) { plane_distance = distance; };
+  void SetPlanePhi(G4double phi) { plane_phi = phi; sin_plane_phi = sin(phi); cos_plane_phi = cos(phi); };
+
+
 
   void SetActRatio(G4int samplingCount);
 
@@ -53,10 +45,14 @@ private:
   G4double GetSolidAngle(const G4ThreeVector &pos) const;
   G4bool CheckPosDirValid(const G4ThreeVector &pos,
                           const G4ThreeVector &dir) const;
-  G4int m_PointSetFlag = 0;
   G4double m_ActRatio = 1;
-  G4ThreeVector mPth1;
-  G4ThreeVector mPth2;
-  G4ThreeVector mPphi1;
-  G4ThreeVector mPphi2;
+  G4double plane_distance{NAN};
+  G4double plane_phi{NAN};
+  G4double sin_plane_phi{NAN}, cos_plane_phi{NAN};
+  G4double a1{NAN}, a2{NAN}, b1{NAN}, b2{NAN};
+
+  // G4ThreeVector mPth1;
+  // G4ThreeVector mPth2;
+  // G4ThreeVector mPphi1;
+  // G4ThreeVector mPphi2;
 };

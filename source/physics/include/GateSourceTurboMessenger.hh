@@ -33,9 +33,11 @@ public:
 protected:
   GateSourceTurbo *mSource;
 
-  G4UIcmdWith3VectorAndUnit *edgePointTheta1Cmd;
-  G4UIcmdWith3VectorAndUnit *edgePointTheta2Cmd;
-  G4UIcmdWith3VectorAndUnit *edgePointPhi1Cmd;
-  G4UIcmdWith3VectorAndUnit *edgePointPhi2Cmd;
+  G4UIcmdWithADoubleAndUnit *SetPlaneDistanceCmd;
+  G4UIcmdWithADoubleAndUnit *SetPlanePhiCmd;
+  G4UIcmdWithADoubleAndUnit *SetA1Cmd;
+  G4UIcmdWithADoubleAndUnit *SetA2Cmd;
+  G4UIcmdWithADoubleAndUnit *SetB1Cmd;
+  G4UIcmdWithADoubleAndUnit *SetB2Cmd;
   G4UIcmdWithAnInteger *SetActRatioCmd;
 };

@@ -5,8 +5,10 @@
 #include <G4ExceptionSeverity.hh>
 #include <G4PrimaryVertex.hh>
 #include <G4ThreeVector.hh>
+#include <G4Transform3D.hh>
 #include <G4Vector3D.hh>
 #include <cmath>
+#include <math.h>
 G4int GateSourceTurbo::GeneratePrimaries(G4Event *event) {
   if (event)
     GateMessage("Beam", 2,
@@ -52,68 +54,49 @@ G4bool GateSourceTurbo::CheckPosDirValid(const G4ThreeVector &pos,
   //   G4double cot2theta = std::copysign(1.0, dir.z()) * dir.z() * dir.z() /
   //                        (dir.x() * dir.x() + dir.y() * dir.y());
 
-  G4double cot2theta_dinominator = (dir.x() * dir.x() + dir.y() * dir.y());
-  G4double cot2theta_numerator =
-      std::copysign(1.0, dir.z()) * dir.z() * dir.z();
+  G4double x0 = pos.x() * cos_plane_phi + pos.y() * sin_plane_phi;
+  G4double y0 = -pos.x() * sin_plane_phi + pos.y() * cos_plane_phi;
+  G4double a1_rel = a1 - y0;
+  G4double a2_rel = a2 - y0;
+  G4double b1_rel = b1 - pos.z();
+  G4double b2_rel = b2 - pos.z();
+  G4double d_rel = plane_distance - x0;
+  G4double dir_x_rotated = dir.x() * cos_plane_phi + dir.y() * sin_plane_phi;
+  G4double dir_y_rotated = -dir.x() * sin_plane_phi + dir.y() * cos_plane_phi;
 
-  G4double x1 = mPth1.x() - pos.x();
-  G4double y1 = mPth1.y() - pos.y();
-  G4double z1 = mPth1.z() - pos.z();
-
-  //   G4double cot2theta1 = std::copysign(1.0, z1) * z1 * z1 / (x1 * x1 + y1 *
-  //   y1);
-  G4double cot2theta1_dinominator = (x1 * x1 + y1 * y1);
-  G4double cot2theta1_numerator = std::copysign(1.0, z1) * z1 * z1;
-  G4double x2 = mPth2.x() - pos.x();
-  G4double y2 = mPth2.y() - pos.y();
-  G4double z2 = mPth2.z() - pos.z();
-  //   G4double cot2theta2 = std::copysign(1.0, z2) * z2 * z2 / (x2 * x2 + y2 *
-  //   y2);
-  G4double cot2theta2_dinominator = (x2 * x2 + y2 * y2);
-  G4double cot2theta2_numerator = std::copysign(1.0, z2) * z2 * z2;
-  //   G4bool theta_valid = (cot2theta1 > cot2theta) && (cot2theta >
-  //   cot2theta2);
-  G4bool theta_valid = (cot2theta1_numerator * cot2theta_dinominator >
-                        cot2theta_numerator * cot2theta1_dinominator) &&
-                       (cot2theta_numerator * cot2theta_dinominator >
-                        cot2theta2_numerator * cot2theta_dinominator);
-
-  // sum of angles between dir and two source-edge vector should be less than
-  // pi, aka whehter sine is positive. Denominator, which are magnitude of
-  // vectors, are ignored, since they do not affect the sign
-
-  x1 = mPphi1.x() - pos.x();
-  y1 = mPphi1.y() - pos.y();
-  x2 = mPphi2.x() - pos.x();
-  y2 = mPphi2.y() - pos.y();
-
-  G4double cross1 = x1 * dir.y() - y1 * dir.x();
-  G4double dot1 = x1 * dir.x() + y1 * dir.y();
-  G4double cross2 = dir.x() * y2 - dir.y() * x2;
-  G4double dot2 = x2 * dir.x() + y2 * dir.y();
-  G4bool phi_valid = (cross1 * dot2 + cross2 * dot1) > 0;
-
-  // TBD
-
-  return theta_valid && phi_valid;
+  G4double intersect_b = d_rel / dir_x_rotated * dir.z() + pos.z();
+  G4double intersect_a = d_rel / dir_x_rotated * dir_y_rotated + y0;
+  return intersect_a <= a2 && intersect_a >= a1 && intersect_b <= b2 &&
+         intersect_b >= b1;
 }
 void GateSourceTurbo::SetPhiTheta(const G4ThreeVector &pos) const {
   // compare theta with cos2, to avoid complex calculation
   //   G4double cot2theta = std::copysign(1.0, dir.z()) * dir.z() * dir.z() /
   //                        (dir.x() * dir.x() + dir.y() * dir.y());
 
-  G4Vector3D v_theta1 = mPth1 - pos;
-  G4Vector3D v_theta2 = mPth2 - pos;
-  G4double theta1 = v_theta1.theta();
-  G4double theta2 = v_theta2.theta();
-  m_angSPS->SetMinTheta(M_PI-theta1);
-  m_angSPS->SetMaxTheta(M_PI-theta2);
-  G4Vector3D v_phi1 = mPphi1 - pos;
-  G4Vector3D v_phi2 = mPphi2 - pos;
-  G4double phi1 = v_phi1.phi();
-  G4double phi2 = v_phi2.phi();
-  m_angSPS->SetMinPhi(M_PI+phi1);
-  m_angSPS->SetMaxPhi(M_PI+phi2);
+  G4double x0 = pos.x() * cos_plane_phi + pos.y() * sin_plane_phi;
+  G4double y0 = -pos.x() * sin_plane_phi + pos.y() * cos_plane_phi;
+  G4double a1_rel = a1 - y0;
+  G4double a2_rel = a2 - y0;
+  G4double b1_rel = b1 - pos.z();
+  G4double b2_rel = b2 - pos.z();
+  G4double d_rel = plane_distance - x0;
+
+  G4double aamax = std::max(a1_rel * a1_rel, a2_rel * a2_rel);
+  G4double aamin = std::min(a1_rel * a1_rel, a2_rel * a2_rel);
+  G4double thetamax = atan2(sqrt(aamax + d_rel * d_rel), b1_rel);
+  G4double thetamin = atan2(sqrt(aamin + d_rel * d_rel), b2_rel);
+  m_angSPS->SetMinTheta(M_PI-thetamin);
+  m_angSPS->SetMaxTheta(M_PI-thetamax);
+  G4double phimin = atan2(a1_rel, d_rel) + plane_phi;
+  G4double phimax = atan2(a2_rel, d_rel) + plane_phi;
+
+  m_angSPS->SetMinPhi(phimin+M_PI);
+  m_angSPS->SetMaxPhi(phimax+M_PI);
+}
+
+G4double solid_angle_pyramid(G4double a, G4double b, G4double d) {
+  return 4 * atan(a * b / (2 * d * sqrt(a * a + b * b + 4 * d * d)));
 }
 
 G4double GateSourceTurbo::GetSolidAngle(const G4ThreeVector &pos) const {
@@ -123,28 +106,28 @@ G4double GateSourceTurbo::GetSolidAngle(const G4ThreeVector &pos) const {
   //               FatalException, "source position not inside edge point");
   // }
 
-  G4double phi1 = atan2(mPphi1.y() - pos.y(), mPphi1.x() - pos.x());
-  G4double phi2 = atan2(mPphi2.y() - pos.y(), mPphi2.x() - pos.x());
-  if (phi2 < phi1) {
-    phi2 += 2 * M_PI;
-  }
-  if (phi2 - phi1 > M_PI) {
-    G4Exception("GateSourceTurbo::GetSolidAngle", "GetSolidAngleError",
-                FatalException, "edge point error: phi1 larger than phi2");
-  }
-  G4double costheta1 = (mPth1.z() - pos.z()) / (mPth1 - pos).mag();
-  G4double costheta2 = (mPth2.z() - pos.z()) / (mPth2 - pos).mag();
-  if (costheta2 < costheta1) {
-    G4Exception("GateSourceTurbo::GetSolidAngle", "GetSolidAngleError",
-                FatalException, "edge point error: theta1 larger than theta2");
-  }
-  return (phi2 - phi1) * (costheta2 - costheta1);
+  // rotate with -plane_phi
+
+  G4double x0 = pos.x() * cos_plane_phi + pos.y() * sin_plane_phi;
+  G4double y0 = -pos.x() * sin_plane_phi + pos.y() * cos_plane_phi;
+  G4double a1_rel = a1 - y0;
+  G4double a2_rel = a2 - y0;
+  G4double b1_rel = b1 - pos.z();
+  G4double b2_rel = b2 - pos.z();
+  G4double d_rel = plane_distance - x0;
+  G4double sa11 = solid_angle_pyramid(2 * a1_rel, 2 * b1_rel, d_rel);
+  G4double sa12 = solid_angle_pyramid(2 * a1_rel, 2 * b2_rel, d_rel);
+  G4double sa21 = solid_angle_pyramid(2 * a2_rel, 2 * b1_rel, d_rel);
+  G4double sa22 = solid_angle_pyramid(2 * a2_rel, 2 * b2_rel, d_rel);
+  G4double sa = sa11 + sa22 - sa12 - sa21;
+  return fabs(sa * 0.25);
 }
 
 void GateSourceTurbo::SetActRatio(G4int samplingCount) {
-  if ((m_PointSetFlag & 0b1111) != 0b1111) {
+  if (a1 != a1 || a2 != a2 || b1 != b1 || b2 != b2 ||
+      plane_distance != plane_distance || plane_phi != plane_phi) {
     G4Exception("GateSourceTurbo::SetActRatio", "SetActRatioError",
-                FatalException, "Not all edge points are set");
+                FatalException, "Not all parameters needed points are set");
   }
   GateVVolume *v = mVolume;
   while (v->GetObjectName() != "world") {
@@ -157,26 +140,35 @@ void GateSourceTurbo::SetActRatio(G4int samplingCount) {
     }
     v = v->GetParentVolume();
   }
-auto start_time = std::chrono::high_resolution_clock::now();
+  auto start_time = std::chrono::high_resolution_clock::now();
   G4double act_ratio_all = 0;
-   G4ThreeVector pos;
+  G4ThreeVector pos;
   for (G4int i = 0; i < samplingCount; i++) {
-   pos = m_posSPS->GenerateOne();
+    pos = m_posSPS->GenerateOne();
     act_ratio_all += GetSolidAngle(pos) / 4 / M_PI;
   }
   m_ActRatio = act_ratio_all / samplingCount;
   auto end_time = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    G4cout << "Activity Ratio of source " << m_name << " is " << m_ActRatio<< Gateendl;
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+      end_time - start_time);
+  G4cout << "Activity Ratio of source " << m_name << " is " << m_ActRatio
+         << Gateendl;
+  if (nVerboseLevel > 0)
+    G4cout << "Time used: " << duration.count() << " microseconds" << Gateendl;
 }
 
 void GateSourceTurbo::GeneratePrimaryVertex(G4Event *event) {
   G4ThreeVector position = m_posSPS->GenerateOne();
   ChangeParticlePositionRelativeToAttachedVolume(position);
   SetPhiTheta(position);
-  G4ThreeVector direction = m_angSPS->GenerateOne();
-  G4PrimaryVertex *vertex =
-      new G4PrimaryVertex(position, GetParticleTime());
+  G4ThreeVector direction;
+  while (true) {
+    direction = m_angSPS->GenerateOne();
+    if (CheckPosDirValid(position, direction)) {
+      break;
+    }
+  }
+  G4PrimaryVertex *vertex = new G4PrimaryVertex(position, GetParticleTime());
 
   // Set placement relative to attached volume
   // DD(particle_momentum_direction);
