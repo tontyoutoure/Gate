@@ -129,7 +129,17 @@ void GateSourceTurbo::SetActRatio(G4int samplingCount) {
     G4Exception("GateSourceTurbo::SetActRatio", "SetActRatioError",
                 FatalException, "Not all parameters needed points are set");
   }
+
+  if (a1 >= a2 || b1 >= b2) {
+    G4Exception("GateSourceTurbo::SetActRatio", "SetActRatioError",
+                FatalException, "a1 >= a2 or b1 >= b2");
+  }
   GateVVolume *v = mVolume;
+  if (v == nullptr) 
+  {
+    SetRelativePlacementVolume("world");
+    v = mVolume;
+  }
   while (v->GetObjectName() != "world") {
 
     if (G4RotationMatrix({{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}) !=
