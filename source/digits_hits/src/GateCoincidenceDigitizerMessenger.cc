@@ -124,7 +124,7 @@ void GateCoincidenceDigitizerMessenger::SetNewValue(G4UIcommand* command,G4Strin
 
 const G4String& GateCoincidenceDigitizerMessenger::DumpMap()
 {
-   static G4String theList = "deadtime MultiplesKiller Buffer timeDiffSelector" ;//readout adder energyFraming timeResolution energyResolution spatialResolution efficiency deadtime pileup adderCompton opticaladder noise merger";
+   static G4String theList = "deadtime multiplesKiller buffer timeDiffSelector" ;//readout adder energyFraming timeResolution energyResolution spatialResolution efficiency deadtime pileup adderCompton opticaladder noise merger";
 
    return theList;
 }
