@@ -1415,10 +1415,10 @@ It simulates the operation of a detector by modeling coincidences, transfer spee
 
 Example::
 
-/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert Buffer
-/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/Buffer/setBufferSize 64 B
-/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/Buffer/setReadFrequency 10 MHz
-/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/Buffer/setMode 1
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
 
 
 For a coincidence sorter user can chose a presort buffer with a following command: 
@@ -1435,7 +1435,7 @@ Multiple coincidence removal
 If the multiple coincidences are kept and not split into pairs (i.e., if any of the **keepXXX** multiple coincidence policies are used), the multicoincidences could contribute to dataflow occupancy but cannot be written to the disk. Unless otherwise specified, any multicoincidence is then cleared from data just before the disk writing. If needed, this clearing could be performed at any earlier coincidence processing step by inserting the **multipleKiller** module at the required level. This module has no parameters and simply removes the multicoincidence events. Multiple coincidences split into many pairs are not affected by this module and cannot be distinguished from normal "simple" coincidences. To insert a multipleKiller, use the syntax::
 
 
-/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert MultiplesKiller
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert multiplesKiller
 
 
 Example of a digitizer setting
