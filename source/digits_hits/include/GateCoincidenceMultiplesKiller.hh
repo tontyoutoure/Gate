@@ -1,12 +1,9 @@
 /*----------------------
    Copyright (C): OpenGATE Collaboration
-
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
 See LICENSE.md for further details
 ----------------------*/
-
-
 #ifndef GateCoincidenceMultiplesKiller_h
 #define GateCoincidenceMultiplesKiller_h 1
 
@@ -14,15 +11,22 @@ See LICENSE.md for further details
 #include <iostream>
 #include <vector>
 #include "G4ThreeVector.hh"
+#include "GateVDigitizerModule.hh"
+#include "GateCoincidenceDigi.hh"
+#include "GateClockDependent.hh"
+#include "GateCrystalSD.hh"
 
+#include "globals.hh"
 #include "GateVPulseProcessor.hh"
 #include "GateObjectStore.hh"
-#include "GateVCoincidencePulseProcessor.hh"
+
+#include "GateCoincidenceDigitizer.hh"
+#include "GateCoincidenceMultiplesKillerMessenger.hh"
 
 class GateCoincidenceMultiplesKillerMessenger;
 
 
-class GateCoincidenceMultiplesKiller : public GateVCoincidencePulseProcessor
+class GateCoincidenceMultiplesKiller : public GateVDigitizerModule
 {
 public:
 
@@ -31,26 +35,30 @@ public:
   //! Destructor
   virtual ~GateCoincidenceMultiplesKiller() ;
 
+  //! Constructs  attached to a GateDigitizer
+  GateCoincidenceMultiplesKiller(GateCoincidenceDigitizer *digitizer, G4String name);
 
-  //! Constructs a new dead time attached to a GateDigitizer
-  GateCoincidenceMultiplesKiller(GateCoincidencePulseProcessorChain* itsChain,
-                                 const G4String& itsName);
 
 public:
+  void Digitize() override;
 
-  //! Implementation of the pure virtual method declared by the base class GateClockDependent
-  //! print-out the attributes specific of the MultiplesKiller
   virtual void DescribeMyself(size_t indent);
 
 protected:
 
-  /*! Implementation of the pure virtual method declared by the base class GateVCoincidencePulseProcessor*/
-  GateCoincidencePulse* ProcessPulse(GateCoincidencePulse* inputPulse,G4int iPulse);
-
-
 
 private:
   GateCoincidenceMultiplesKillerMessenger *m_messenger;    //!< Messenger
+  GateCoincidenceDigi* m_outputDigi;
+
+  GateCoincidenceDigiCollection* m_OutputDigiCollection;
+
+  GateCoincidenceDigitizer* m_digitizer;
+  G4int nVerboseLevel;
+
+
+
+
 };
 
 
