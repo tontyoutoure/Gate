@@ -65,6 +65,10 @@ public:
   static void SetOutputIDName(G4int id_system, const char * anOutputIDName, size_t depth);
   G4bool getHitsEnabled() const;
   void setHitsEnabled(G4bool mHitsEnabled);
+
+  G4bool getHitsCommonOutputEnabled() const;
+  void setHitsCommonOutputEnabled(G4bool mHitsCommonOutputEnabled);
+
   void addCollection(const std::string &str); //called by messenger
   //OK GND 2022
   void setCCenabled(G4bool mCCenabled){m_cc_enabled=mCCenabled;};
@@ -135,6 +139,7 @@ private:
   std::vector<std::string> m_listOfSinglesCollection;
   std::vector<std::string> m_listOfCoincidencesCollection;
   G4bool m_hits_enabled;
+  G4bool m_hitsCommonOutput_enabled;
   G4String m_uselessFileName; //only for GiveNameOfFile which return a reference..
 
   G4bool m_opticalData_enabled = false;

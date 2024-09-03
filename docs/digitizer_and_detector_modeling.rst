@@ -1417,10 +1417,11 @@ Here is an example of how to configure this in a macro file:
 **Example** ::
 
 
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
+
 
 
 For a coincidence sorter user can chose a presort buffer with a following command: 

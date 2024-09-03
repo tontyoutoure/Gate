@@ -7,16 +7,24 @@ See LICENSE.md for further details
 ----------------------*/
 
 
-#include "GateCoincidenceBufferMessenger.hh"
-
-#include "GateCoincidenceBuffer.hh"
-
+#include "../include/GateCoincidenceBuffer.hh"
+#include "../include/GateCoincidenceBufferMessenger.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 //#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAnInteger.hh"
+#include "GateDigitizerMgr.hh"
 
-GateCoincidenceBufferMessenger::GateCoincidenceBufferMessenger(GateCoincidenceBuffer* itsBuffer)
-    : GateClockDependentMessenger(itsBuffer)
+#include "G4SystemOfUnits.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIdirectory.hh"
+
+
+#include "G4UIcmdWithAnInteger.hh"
+
+
+GateCoincidenceBufferMessenger::GateCoincidenceBufferMessenger(GateCoincidenceBuffer* CoincidenceBuffer)
+:GateClockDependentMessenger(CoincidenceBuffer),
+ 	 m_CoincidenceBuffer(CoincidenceBuffer)
 {
   G4String guidance;
   G4String cmdName;
@@ -55,13 +63,14 @@ GateCoincidenceBufferMessenger::~GateCoincidenceBufferMessenger()
 void GateCoincidenceBufferMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
   if (command== m_bufferSizeCmd)
-    { GetBuffer()->SetBufferSize((long long unsigned int) m_bufferSizeCmd->GetNewDoubleValue(newValue)); }
+    { m_CoincidenceBuffer->SetBufferSize((long long unsigned int) m_bufferSizeCmd->GetNewDoubleValue(newValue)); }
   else if (command == m_readFrequencyCmd)
-    GetBuffer()->SetReadFrequency(m_readFrequencyCmd->GetNewDoubleValue(newValue));
+	  m_CoincidenceBuffer->SetReadFrequency(m_readFrequencyCmd->GetNewDoubleValue(newValue));
 //   else if (command == m_modifyTimeCmd)
 //     GetBuffer()->SetDoModifyTime(m_modifyTimeCmd->GetNewBoolValue(newValue));
   else if (command == m_setModeCmd)
-    GetBuffer()->SetMode(m_setModeCmd->GetNewIntValue(newValue));
+	  m_CoincidenceBuffer ->SetMode(m_setModeCmd->GetNewIntValue(newValue));
   else
     GateClockDependentMessenger::SetNewValue(command,newValue);
 }
+
