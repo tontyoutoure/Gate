@@ -150,6 +150,8 @@ void GateCoincidenceSorterMessenger::SetNewValue(G4UIcommand* aCommand, G4String
 	    	  {
 	  		  G4String new_name= newValue+"_"+digitizerMgr->m_SDlist[0]->GetName();
 	  		  //G4cout<<" new_name "<< new_name<<G4endl;
+	  		  if (!(digitizerMgr->FindSinglesDigitizer(new_name)))
+	  			  GateError("ERROR: The name used in coincidence sorter has to be the SD name;_"+ newValue+"_ is unknown for input singles digicollection! \n");
 	  		  inputDigitizer = digitizerMgr->FindSinglesDigitizer(new_name);
 	  		  m_CoincidenceSorter->SetInputName(new_name);
 	  		  m_CoincidenceSorter->SetSystem(new_name); //! A
