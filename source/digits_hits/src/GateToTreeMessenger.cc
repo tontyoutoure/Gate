@@ -37,6 +37,10 @@ GateToTreeMessenger::GateToTreeMessenger(GateToTree *m) :
   m_enableHitsOutput = new G4UIcmdWithoutParameter("/gate/output/tree/hits/enable", this);
   m_disableHitsOutput = new G4UIcmdWithoutParameter("/gate/output/tree/hits/disable", this);
 
+  m_enableHitsCommonOutput = new G4UIcmdWithoutParameter("/gate/output/tree/hitsCommonOutput/enable", this);
+  m_disableHitsCommonOutput = new G4UIcmdWithoutParameter("/gate/output/tree/hitsCommonOutput/disable", this);
+
+
   m_enableOpticalDataOutput = new G4UIcmdWithoutParameter("/gate/output/tree/optical/enable", this);
   m_disableOpticalDataOutput = new G4UIcmdWithoutParameter("/gate/output/tree/optical/disable", this);
 
@@ -103,6 +107,8 @@ GateToTreeMessenger::~GateToTreeMessenger()
   delete m_addOpticalCollectionCmd;
   delete m_enableHitsOutput;
   delete m_disableHitsOutput;
+  delete m_enableHitsCommonOutput;
+  delete m_disableHitsCommonOutput;
 
 }
 
@@ -118,6 +124,11 @@ void GateToTreeMessenger::SetNewValue(G4UIcommand *icommand, G4String string)
     m_gateToTree->setHitsEnabled(true);
   if(icommand == m_disableHitsOutput)
     m_gateToTree->setHitsEnabled(false);
+
+  if(icommand == m_enableHitsCommonOutput)
+    m_gateToTree->setHitsCommonOutputEnabled(true);
+  if(icommand == m_disableHitsCommonOutput)
+    m_gateToTree->setHitsCommonOutputEnabled(false);
 
   if(icommand == m_enableOpticalDataOutput)
     m_gateToTree->setOpticalDataEnabled(true);
