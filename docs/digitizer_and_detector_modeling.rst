@@ -1154,7 +1154,7 @@ Then, the rejection can be set to the whole event or only to those pulses within
 
 Example::
 
-	/gate/digitizerMgr/absorber/SinglesDigitizer/Singles/insert                        multipleRejection
+    /gate/digitizerMgr/absorber/SinglesDigitizer/Singles/insert                        multipleRejection
    /gate/digitizerMgr/absorber/SinglesDigitizer/Singles/multipleRejection/setMultipleDefinition volumeID
    /gate/digitizerMgr/absorber/SinglesDigitizer/Singles/multipleRejection/setEventRejection 1
 
@@ -1411,10 +1411,20 @@ The dead time for coincidences works in the same way as that acting on the *sing
 
 Coincidence buffers
 ~~~~~~~~~~~~~~~~~~~
+It simulates the operation of a detector by modeling coincidences, transfer speed limits, and data loss due to buffer capacity overflows. It manages a memory buffer for coincidence events, allowing for the modeling of data loss due to buffer overflow. It uses a read frequency and allows defining the buffer size and read mode, influencing how events are processed. There are two buffer operation modes. Mode 1 empties the entire buffer at each read clock tick, while Mode 0 reads events one by one.
+
+Example::
+
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
+
 
 For a coincidence sorter user can chose a presort buffer with a following command: 
 
    /gate/digitizer/Coincidences/setPresortBufferSize 256 
+
 
 A presort buffer contains singles that have not yet been checked for coincidence with the already open coincidence windows. The default value is 256, the minimum value is 32. For more details, check https://iopscience.iop.org/article/10.1088/0031-9155/61/18/N522
 
@@ -1422,9 +1432,11 @@ A presort buffer contains singles that have not yet been checked for coincidence
 Multiple coincidence removal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the multiple coincidences are kept and not splitted into pairs (ie. if any of the **keepXXX** multiple coincidence policy is used), the multicoincidences could participate to dataflow occupancy, but could not be written to the disk. Unless otherwise specified, any multicoincidence is then cleared from data just before the disk writing. If needed, this clearing could be performed at any former coincidence processing step, by inserting the **multipleKiller** module at the required level. This module has no parameter and just kill the multicoincidence events. Multiple coincidences split into many pairs are not affected by this module and cannot be distinguished from the normal "simple" coincidences. To insert a multipleKiller, one has to use the syntax::
+If the multiple coincidences are kept and not split into pairs (i.e., if any of the **keepXXX** multiple coincidence policies are used), the multicoincidences could contribute to dataflow occupancy but cannot be written to the disk. Unless otherwise specified, any multicoincidence is then cleared from data just before the disk writing. If needed, this clearing could be performed at any earlier coincidence processing step by inserting the **multipleKiller** module at the required level. This module has no parameters and simply removes the multicoincidence events. Multiple coincidences split into many pairs are not affected by this module and cannot be distinguished from normal "simple" coincidences. To insert a multipleKiller, use the syntax::
 
-   /gate/digitizer/myCoincChain/insert multipleKiller
+
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert multiplesKiller
+
 
 Example of a digitizer setting
 ------------------------------
@@ -1529,6 +1541,7 @@ Example::
    87 /gate/digitizer/finalCoinc/buffer/setBufferSize 32 B 
    88 /gate/digitizer/finalCoinc/buffer/setReadFrequency 14.45 MHz  
    89 /gate/digitizer/finalCoinc/buffer/setMode 0 
+   
 
 Lines 1 to 15: The branch named "Singles" contains the result of applying the adder, readout, blurring, and threshold (50 keV) modules.
 
