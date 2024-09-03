@@ -184,16 +184,6 @@ void GateCoincidenceSorter::Digitize()
   GateSinglesDigitizer* inputDigitizer;
 
   inputDigitizer = digitizerMgr->FindSinglesDigitizer(m_inputName);//m_collectionName);
-  //G4cout<<"m_inputName "<<inputDigitizer->GetName()<<G4endl;
-  if (!inputDigitizer)
-	  if (digitizerMgr->m_SDlist.size()==1)
-  	  {
-		  G4String new_name= m_inputName+"_"+digitizerMgr->m_SDlist[0]->GetName();
-		  //G4cout<<" new_name "<< new_name<<G4endl;
-		  inputDigitizer = digitizerMgr->FindSinglesDigitizer(new_name);
-  	  }
-	  else
-		  GateError("ERROR: The name _"+ m_inputName+"_ is unknown for input singles digicollection! \n");
 
   if(!m_system)
     {
