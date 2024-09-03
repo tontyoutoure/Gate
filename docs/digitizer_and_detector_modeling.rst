@@ -1436,10 +1436,11 @@ Here is an example of how to configure this in a macro file:
 **Example** ::
 
 
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
-  /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
+/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 1
+
 
 
 For a coincidence sorter user can chose a presort buffer with a following command: 
@@ -1462,11 +1463,8 @@ If the multiple coincidences are kept and not split into pairs (i.e., if any of 
 Coincidence Time Difference Selector
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Responsible for selecting events based on the time difference between input signals. Below is an example of how to configure it in a macro file:
+Responsible for selecting events based on the time difference between input signals. Below is an example of how to configure it in a macro file::
 
-
-
-**Example** ::
 
 
   /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert timeDiffSelector
