@@ -125,6 +125,7 @@ void GateCoincidenceDigitizerMessenger::SetNewValue(G4UIcommand* command,G4Strin
 const G4String& GateCoincidenceDigitizerMessenger::DumpMap()
 {
 
+
    static G4String theList = "deadtime multiplesKiller buffer timeDiffSelector" ;//readout adder energyFraming timeResolution energyResolution spatialResolution efficiency deadtime pileup adderCompton opticaladder noise merger";
 
 
@@ -170,7 +171,6 @@ void GateCoincidenceDigitizerMessenger::DoInsertion(const G4String& childTypeNam
     	  newDM = new GateCoincidenceTimeDiffSelector(m_CoinDigitizer, DMname);
     	  m_CoinDigitizer->AddNewModule(newDM);
       }
-
 
   /*else if (childTypeName=="readout")
   {
