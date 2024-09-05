@@ -40,6 +40,8 @@ GateCoincidenceSorter::GateCoincidenceSorter(GateDigitizerMgr* itsDigitizerMgr,
     m_offset(0.),
     m_offsetJitter(0.),
     m_minSectorDifference(2),
+	m_minS (-1),
+	m_maxDeltaZ ( -1),
     m_forceMinSecDifferenceToZero(false),	  
     m_multiplesPolicy(kKeepIfAllAreGoods),
     m_allDigiOpenCoincGate(false),
@@ -182,16 +184,6 @@ void GateCoincidenceSorter::Digitize()
   GateSinglesDigitizer* inputDigitizer;
 
   inputDigitizer = digitizerMgr->FindSinglesDigitizer(m_inputName);//m_collectionName);
-  //G4cout<<"m_inputName "<<inputDigitizer->GetName()<<G4endl;
-  if (!inputDigitizer)
-	  if (digitizerMgr->m_SDlist.size()==1)
-  	  {
-		  G4String new_name= m_inputName+"_"+digitizerMgr->m_SDlist[0]->GetName();
-		  //G4cout<<" new_name "<< new_name<<G4endl;
-		  inputDigitizer = digitizerMgr->FindSinglesDigitizer(new_name);
-  	  }
-	  else
-		  GateError("ERROR: The name _"+ m_inputName+"_ is unknown for input singles digicollection! \n");
 
   if(!m_system)
     {
@@ -747,10 +739,37 @@ G4bool GateCoincidenceSorter::IsForbiddenCoincidence(const GateDigi* digi1, cons
       	    G4cout << "[GateCoincidenceSorter::IsForbiddenCoincidence]: coincidence between neighbour blocks --> refused\n";
 	return true;
 	}
+  G4ThreeVector globalPos1 = digi1->GetGlobalPos();
+  G4ThreeVector globalPos2 = digi2->GetGlobalPos();
+
+  // Check the difference in Z between the two positions
+  if ((m_maxDeltaZ > 0) && (fabs(globalPos2.z() - globalPos1.z()) > m_maxDeltaZ)) {
+      if (nVerboseLevel > 1)
+          G4cout << "[GateCoincidenceSorter::IsForbiddenCoincidence]: difference in Z too large --> refused\n";
+      return true;
+  }
+
+  // Calculate the denominator for distance 's' in the XY plane
+  G4double denom = (globalPos1.y() - globalPos2.y()) * (globalPos1.y() - globalPos2.y()) +
+                   (globalPos2.x() - globalPos1.x()) * (globalPos2.x() - globalPos1.x());
+
+  G4double s = 0.0;
+  if (denom != 0.0) {
+      denom = sqrt(denom);
+      s = (globalPos1.x() * (globalPos1.y() - globalPos2.y()) +
+           globalPos1.y() * (globalPos2.x() - globalPos1.x())) / denom;
+  }
+
+
+  // Check the distance 's' against the maximum threshold
+  if ((m_minS < 0) && (fabs(s) < m_minS)) {
+      if (nVerboseLevel > 1)
+          G4cout << "[GateCoincidenceSorter::IsForbiddenCoincidence]: distance s too large --> refused\n";
+      return true;
+  }
 
   return false;
-   }
-
+  }
 }
 //------------------------------------------------------------------------------------------------------
 
