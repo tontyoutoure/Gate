@@ -1298,6 +1298,16 @@ To change the default value of the minimum sector difference for valid coinciden
 
    /gate/digitizerMgr/CoincidenceSorter/Coincidences/minSectorDifference <number> 
 
+To change the default value of the maximum allowable difference in the z positions of two events (disabled by default), the command line should be used::
+
+  /gate/digitizer/Coincidences/setMaxDeltaZ <value_in_mm>
+
+For non-standard scanners, such as square-shaped ones, you can set the minimum allowable sector distance s between two events. This option provides more flexibility than the default minimum sector difference::
+
+/gate/digitizer/Coincidences/setSMin <value_in_mm>
+
+This command is particularly useful for defining the minimum spatial separation required between two events in non-circular or irregular scanner geometries. The setMinS command allows users to control this parameter directly.
+
 By default, the offset value is equal to 0, which corresponds to a prompt coincidence sorter. If a delayed coincidence sorter is to be simulated, with a 100 ns time shift for instance, the offset value should be set using the command::
 
    /gate/digitizerMgr/CoincidenceSorter/Coincidences/setOffset 100. ns 
@@ -1435,7 +1445,9 @@ A presort buffer contains singles that have not yet been checked for coincidence
 Multiple coincidence removal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 If the multiple coincidences are kept and not split into pairs (i.e., if any of the **keepXXX** multiple coincidence policies are used), the multicoincidences could contribute to dataflow occupancy but cannot be written to the disk. Unless otherwise specified, any multicoincidence is then cleared from data just before the disk writing. If needed, this clearing could be performed at any earlier coincidence processing step by inserting the **multiplesKiller** module at the required level. This module has no parameters and simply removes the multicoincidence events. Multiple coincidences split into many pairs are not affected by this module and cannot be distinguished from normal "simple" coincidences. To insert a multipleKiller, use the syntax ::
+
 
 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert multiplesKiller
 
@@ -1446,10 +1458,7 @@ Coincidence Time Difference Selector
 
 This module reprocesses the list of coincidences and applies a cut on the time difference between two Singles forming the coincidence, i. e. appalling a cut tighter than coincidence time window selected by coincidence sorter.
 
-
-
 **Example** ::
-
 
   /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert timeDiffSelector
   /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/timeDiffSelector/setMin 1 ns
@@ -1540,28 +1549,43 @@ Example::
    66 /gate/digitizerMgr/CoincidenceSorter/Coincidences/setOffset 0. ns 
    67 /gate/digitizerMgr/CoincidenceSorter/Coincidences/setWindow 24. ns 
    68 /gate/digitizerMgr/CoincidenceSorter/Coincidences/minSectorDifference 3  
-   69 
-   70 /gate/digitizerMgr/name delayedCoincidences  
-   71 /gate/digitizerMgr/insert coincidenceSorter  
-   72 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setInputCollection cutSingles  
-   73 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setOffset 100. ns  
-   74 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setWindow 24. ns  
-   75 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/minSectorDifference 3  
-   76 
-   77 /gate/digitizer/name finalCoinc  (NOT YET ADDED IN 9.3)  
-   78 /gate/digitizer/insert coincidenceChain 
-   79 /gate/digitizer/finalCoinc/addInputName delay 
-   80 /gate/digitizer/finalCoinc/addInputName Coincidences  
-   81 /gate/digitizer/finalCoinc/usePriority true  
-   82 /gate/digitizer/finalCoinc/insert deadtime  
-   83 /gate/digitizer/finalCoinc/deadtime/setDeadTime 60 ns  
-   84 /gate/digitizer/finalCoinc/deadtime/setMode nonparalysable  
-   85 /gate/digitizer/finalCoinc/deadtime/conserveAllEvent true  
-   86 /gate/digitizer/finalCoinc/insert buffer  
-   87 /gate/digitizer/finalCoinc/buffer/setBufferSize 32 B 
-   88 /gate/digitizer/finalCoinc/buffer/setReadFrequency 14.45 MHz  
-   89 /gate/digitizer/finalCoinc/buffer/setMode 0 
-   
+   69 /gate/digitizerMgr/CoincidenceSorter/Coincidences/setSMax 1 mm
+   70 /gate/digitizerMgr/CoincidenceSorter/Coincidences/setDeltaZMax 10 mm
+   71
+   72 /gate/digitizerMgr/name delayedCoincidences  
+   73 /gate/digitizerMgr/insert coincidenceSorter  
+   74 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setInputCollection cutSingles  
+   75 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setOffset 100. ns  
+   76 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/setWindow 24. ns  
+   77 /gate/digitizerMgr/CoincidenceSorter/delayedCoincidences/minSectorDifference 3  
+   78 
+   79 /gate/digitizerMgr/name finalCoinc 
+   80 /gate/digitizerMgr/insert CoincidenceDigitizer
+   81 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/addInputCollection Delay
+   82 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/addInputCollection Coincidences
+   83 #/gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/usePriority false
+   84 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/describe
+   85
+   86 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert deadtime
+   87 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/deadtime/setDeadTime 60 ns
+   88 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/deadtime/setMode paralysable
+   89 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/deadtime/conserveAllEvent false #true
+   90 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/deadtime/verbose  6
+   91
+   92 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
+   93 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
+   94 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 0.1 MHz
+   95 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setMode 0
+   96 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/describe
+   97
+   98 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert multiplesKiller
+   99  
+   100 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert timeDiffSelector
+   101 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/timeDiffSelector/setMin 1 ns
+   102 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/timeDiffSelector/setMax 500 ns
+
+
+
 
 Lines 1 to 15: The branch named "Singles" contains the result of applying the adder, readout, blurring, and threshold (50 keV) modules.
 
@@ -1577,9 +1601,8 @@ Lines 65 to 68: The "default" coincidence branch consists of data taken from the
 
 Lines 70 to 75: A second coincidence branch is defined (line 71), which is named "delayedCoincidences". This branch takes its data from the same output ("cutSingles"), but is defined by a delayed coincidence window of 24 ns, and a 100 ns delay (line 73).
 
-Lines 77 to 89: The delayed and  the prompts coincidence lines are grouped (lines 79-80). Between two coincidences coming from these two lines and occuring within a given event, the priority is set to the delayed line, since it is inserted before the prompt line, and the priority is used (line 81). A non-paralysable dead time of 60 ns is applied on the delayed+prompt coincidences (lines 82-85). If more than one coincidence occur inside a given event, the dead time can kill all of them or none of them, depending on the arrival time of the first one. As a consequence, if a delay coincidence is immediately followed by a prompt coincidence due to the same photon, then, the former will not hide the latter (line 85). Finally, a memory buffer of 32 coincidences, read at a frequency of 14.45 MHz, in an event-by-event basis (line 89) is applied to the delayed+prompt sum (lines 86-89).
+Lines 80 to 102: The delayed and prompt coincidence collections are grouped (lines 81-82). The priority is not set between coincidences from these collections, as the priority option is commented out (line 83). A paralysable dead time of 60 ns is applied to the combined delayed and prompt coincidences (lines 87-90). If more than one coincidence occurs within a given event, the dead time may eliminate all or none of them, depending on the arrival time of the first coincidence. As a result, if a delayed coincidence is immediately followed by a prompt coincidence from the same photon, the delayed one may suppress the prompt one (line 89). Finally, a memory buffer of 64 coincidences, read at a frequency of 0.1 MHz, on an event-by-event basis (line 94), is applied to the combined delayed and prompt coincidences (lines 92-96). Additional modules, including a multiples killer and a time difference selector, are inserted. The time difference selector sets a coincidence window ranging from 1 ns to 500 ns (lines 98-102).
 
-Digitizer optimization
 ----------------------
 
 In GATE standard operation mode, primary particles are generated by the source manager, and then propagated through the attenuating geometry before generating *hits* in the detectors, which feed into the digitizer chain. While this operation mode is suited for conventional simulations, it is inefficient when trying to optimize the parameters of the digitizer chain. In this case, the user needs to compare the results obtained for different sets of digitizer parameters that are based upon the same series of hits. Thus, repeating the particle generation and propagation stages of a simulation is unnecessary for tuning the digitizer setting.
