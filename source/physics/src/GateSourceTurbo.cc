@@ -84,8 +84,18 @@ void GateSourceTurbo::SetPhiTheta(const G4ThreeVector &pos) const {
 
   G4double aamax = std::max(a1_rel * a1_rel, a2_rel * a2_rel);
   G4double aamin = std::min(a1_rel * a1_rel, a2_rel * a2_rel);
-  G4double thetamax = atan2(sqrt(aamax + d_rel * d_rel), b1_rel);
-  G4double thetamin = atan2(sqrt(aamin + d_rel * d_rel), b2_rel);
+  G4double thetamax, thetamin;
+  if (a1_rel < 0 and a2_rel > 0 and b1_rel < 0)
+    // in this case, need to check minmum/maxmum of the hyperbola 
+    thetamax = atan2(d_rel,b1_rel);
+  else
+    thetamax = atan2(sqrt(aamax + d_rel * d_rel), b1_rel);
+
+  if (a1_rel < 0 and a2_rel > 0 and b2_rel > 0)
+    thetamin = atan2(d_rel,b2_rel);
+  else
+    thetamin = atan2(sqrt(aamin + d_rel * d_rel), b2_rel);
+  
   m_angSPS->SetMinTheta(M_PI-thetamin);
   m_angSPS->SetMaxTheta(M_PI-thetamax);
   G4double phimin = atan2(a1_rel, d_rel) + plane_phi;
