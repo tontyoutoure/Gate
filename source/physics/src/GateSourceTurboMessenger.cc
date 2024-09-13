@@ -3,6 +3,7 @@
 #include "G4UIcmdWithAnInteger.hh"
 #include "GateSourceTurbo.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithADouble.hh"
 
 GateSourceTurboMessenger::GateSourceTurboMessenger(GateSourceTurbo *source)
     : GateVSourceMessenger(source), mSource(source) {
@@ -42,12 +43,21 @@ GateSourceTurboMessenger::GateSourceTurboMessenger(GateSourceTurbo *source)
   SetB2Cmd = new G4UIcmdWithADoubleAndUnit(cmdName, this);
   SetB2Cmd->SetGuidance("Set top edge of the opening, relative to closet point to system center on the target plane.");
   SetB2Cmd->SetParameterName("b2", false);
+
+  cmdName = GetDirectoryName() + "initialize";
+  InitializeCmd = new G4UIcmdWithAnInteger(cmdName, this);
+  InitializeCmd->SetGuidance("Initialize the source with a given number of samplings.");
+  InitializeCmd->SetParameterName("nSamples", false);
   
   cmdName = GetDirectoryName() + "setActRatio";
-  SetActRatioCmd = new G4UIcmdWithAnInteger(cmdName, this);
-  SetActRatioCmd->SetGuidance("Set the activity ratio with a sampling count.");
-  SetActRatioCmd->SetParameterName("samplingCount", true, false);
-  SetActRatioCmd->SetDefaultValue(10000000);
+  SetActRatioCmd = new G4UIcmdWithADouble(cmdName, this);
+  SetActRatioCmd->SetGuidance("Set the activity ratio of the source.");
+  SetActRatioCmd->SetParameterName("actRatio", false);
+
+  cmdName = GetDirectoryName() +"setMaxSolidAngle";
+  SetMaxSolidAngleCmd = new G4UIcmdWithADouble(cmdName, this);
+  SetMaxSolidAngleCmd->SetGuidance("Set the maximum solid angle of the source.");
+  SetMaxSolidAngleCmd->SetParameterName("maxSolidAngle", false);
 }
 
 GateSourceTurboMessenger::~GateSourceTurboMessenger() {
@@ -58,6 +68,8 @@ GateSourceTurboMessenger::~GateSourceTurboMessenger() {
   delete SetB1Cmd;
   delete SetB2Cmd;
   delete SetActRatioCmd;
+  delete SetMaxSolidAngleCmd;
+  delete InitializeCmd;
 }
 
 void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
@@ -76,6 +88,12 @@ void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
   } else if (command == SetB2Cmd) {
     mSource->SetB2(SetB2Cmd->GetNewDoubleValue(newValue));
   } else if (command == SetActRatioCmd) {
-    mSource->SetActRatio(SetActRatioCmd->GetNewIntValue(newValue));
+    mSource->SetActRatio(SetActRatioCmd->GetNewDoubleValue(newValue));
   }
+  else if (command == SetMaxSolidAngleCmd) {
+    mSource->SetMaxSolidAngle(SetMaxSolidAngleCmd->GetNewDoubleValue(newValue));
+  }
+  else if (command == InitializeCmd) {
+    mSource->Initialize(InitializeCmd->GetNewIntValue(newValue));
+  }  
 }

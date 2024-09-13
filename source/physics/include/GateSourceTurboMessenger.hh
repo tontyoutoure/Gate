@@ -39,5 +39,7 @@ protected:
   G4UIcmdWithADoubleAndUnit *SetA2Cmd;
   G4UIcmdWithADoubleAndUnit *SetB1Cmd;
   G4UIcmdWithADoubleAndUnit *SetB2Cmd;
-  G4UIcmdWithAnInteger *SetActRatioCmd;
+  G4UIcmdWithAnInteger *InitializeCmd;
+  G4UIcmdWithADouble *SetActRatioCmd;
+  G4UIcmdWithADouble *SetMaxSolidAngleCmd;
 };

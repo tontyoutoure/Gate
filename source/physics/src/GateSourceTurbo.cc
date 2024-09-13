@@ -9,6 +9,7 @@
 #include <G4Vector3D.hh>
 #include <cmath>
 #include <math.h>
+#include "Randomize.hh"
 G4int GateSourceTurbo::GeneratePrimaries(G4Event *event) {
   if (event)
     GateMessage("Beam", 2,
@@ -133,7 +134,7 @@ G4double GateSourceTurbo::GetSolidAngle(const G4ThreeVector &pos) const {
   return fabs(sa * 0.25);
 }
 
-void GateSourceTurbo::SetActRatio(G4int samplingCount) {
+void GateSourceTurbo::Initialize(G4int samplingCount) {
   if (a1 != a1 || a2 != a2 || b1 != b1 || b2 != b2 ||
       plane_distance != plane_distance || plane_phi != plane_phi) {
     G4Exception("GateSourceTurbo::SetActRatio", "SetActRatioError",
@@ -165,20 +166,53 @@ void GateSourceTurbo::SetActRatio(G4int samplingCount) {
   G4ThreeVector pos;
   for (G4int i = 0; i < samplingCount; i++) {
     pos = m_posSPS->GenerateOne();
-    act_ratio_all += GetSolidAngle(pos) / 4 / M_PI;
+    G4double solid_angle = GetSolidAngle(pos);
+    if (solid_angle > max_solid_angle) 
+      max_solid_angle = solid_angle;
+    act_ratio_all += solid_angle / 4 / M_PI;
   }
-  m_ActRatio = act_ratio_all / samplingCount;
+  act_ratio = act_ratio_all / samplingCount;
+  act_ratio_set = true;
+  max_solid_angle_set = true;
   auto end_time = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
       end_time - start_time);
-  G4cout << "Activity Ratio of source " << m_name << " is " << m_ActRatio
+  G4cout << "Activity Ratio of source " << m_name << " is " << act_ratio
+         << Gateendl;
+  G4cout << "Max Solid Angle of source " << m_name << " is " << max_solid_angle
          << Gateendl;
   if (nVerboseLevel > 0)
     G4cout << "Time used: " << duration.count() << " microseconds" << Gateendl;
+  
 }
 
 void GateSourceTurbo::GeneratePrimaryVertex(G4Event *event) {
+  if (not (act_ratio_set and max_solid_angle_set)) {
+    G4String error_msg = "activity ratio or max solid angle not set for source: ";
+    error_msg += m_name;
+    G4Exception("GateSourceTurbo::GeneratePrimaryVertex",
+                "GeneratePrimaryVertexError", FatalException,
+                error_msg);
+  }
   G4ThreeVector position = m_posSPS->GenerateOne();
+
+  //probability of the position is valid should be proportional to the solid angle
+  while (true) {
+    G4double solid_angle = GetSolidAngle(position);
+    if (solid_angle > max_solid_angle * 1.1) {
+      G4String error_msg = "solid angle of position is larger than max solid angle for source: ";
+      error_msg += m_name;
+      error_msg += "\nyou may increase max solid angle and try again";
+      G4Exception("GateSourceTurbo::GeneratePrimaryVertex",
+                  "GeneratePrimaryVertexError", FatalException,
+                  error_msg);
+    }
+    if (G4UniformRand() < solid_angle / max_solid_angle / 1.1) {
+      break;
+    }
+    position = m_posSPS->GenerateOne();
+  }
+
   ChangeParticlePositionRelativeToAttachedVolume(position);
   SetPhiTheta(position);
   G4ThreeVector direction;
@@ -282,7 +316,7 @@ G4double GateSourceTurbo::GetNextTime(G4double timeStart) {
       }
     }
 
-    activityNow *= m_ActRatio;
+    activityNow *= act_ratio;
 
     if (nVerboseLevel > 0)
       G4cout << "GateVSource::GetNextTime : Initial activity (becq) : "

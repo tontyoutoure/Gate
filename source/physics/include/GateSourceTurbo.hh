@@ -38,14 +38,19 @@ public:
 
 
 
-  void SetActRatio(G4int samplingCount);
+  void SetActRatio(G4double actRatio){act_ratio = actRatio;};
+  void SetMaxSolidAngle(G4double maxSolidAngle) { max_solid_angle = maxSolidAngle; };
+  void Initialize(G4int samplingCount);
 
 private:
   void SetPhiTheta(const G4ThreeVector &pos) const;
   G4double GetSolidAngle(const G4ThreeVector &pos) const;
   G4bool CheckPosDirValid(const G4ThreeVector &pos,
                           const G4ThreeVector &dir) const;
-  G4double m_ActRatio = 1;
+  G4double act_ratio = 1;
+  G4double max_solid_angle = 0;
+  G4bool act_ratio_set;
+  G4bool max_solid_angle_set;
   G4double plane_distance{NAN};
   G4double plane_phi{NAN};
   G4double sin_plane_phi{NAN}, cos_plane_phi{NAN};
