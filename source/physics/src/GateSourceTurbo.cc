@@ -10,6 +10,7 @@
 #include <cmath>
 #include <math.h>
 #include "Randomize.hh"
+#include <iomanip>
 G4int GateSourceTurbo::GeneratePrimaries(G4Event *event) {
   if (event)
     GateMessage("Beam", 2,
@@ -177,10 +178,10 @@ void GateSourceTurbo::Initialize(G4int samplingCount) {
   auto end_time = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
       end_time - start_time);
-  G4cout << "Activity Ratio of source " << m_name << " is " << act_ratio
-         << Gateendl;
-  G4cout << "Max Solid Angle of source " << m_name << " is " << max_solid_angle
-         << Gateendl;
+  G4cout << "Activity Ratio of source " << m_name << " is " << std::scientific 
+         << std::setprecision(10) << act_ratio << std::defaultfloat << Gateendl;
+  G4cout << "Max Solid Angle of source " << m_name << " is " << std::scientific 
+         << std::setprecision(10) << max_solid_angle<< std::defaultfloat << Gateendl;
   if (nVerboseLevel > 0)
     G4cout << "Time used: " << duration.count() << " microseconds" << Gateendl;
   

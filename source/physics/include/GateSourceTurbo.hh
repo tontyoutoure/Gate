@@ -38,8 +38,8 @@ public:
 
 
 
-  void SetActRatio(G4double actRatio){act_ratio = actRatio;};
-  void SetMaxSolidAngle(G4double maxSolidAngle) { max_solid_angle = maxSolidAngle; };
+  void SetActRatio(G4double actRatio){act_ratio = actRatio;act_ratio_set = true;};
+  void SetMaxSolidAngle(G4double maxSolidAngle) { max_solid_angle = maxSolidAngle; max_solid_angle_set = true; };
   void Initialize(G4int samplingCount);
 
 private:
