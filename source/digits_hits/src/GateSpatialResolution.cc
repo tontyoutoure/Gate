@@ -313,6 +313,9 @@ void GateSpatialResolution::UpdateVolumeID()
 		}
 }
 
+
+
+
 void GateSpatialResolution::DescribeMyself(size_t indent )
 {
 	if(m_fwhm)

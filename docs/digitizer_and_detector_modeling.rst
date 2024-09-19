@@ -1159,6 +1159,107 @@ Example::
    /gate/digitizerMgr/absorber/SinglesDigitizer/Singles/multipleRejection/setEventRejection 1
 
 
+
+
+
+
+
+
+Virtual segmentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+In traditional PET image reconstruction, software like CASToR utilizes crystal IDs instead of the position of the interaction. This approach has sufficed because the small crystals' size inherently defines the spatial resolution. However, new PET scanner systems are exploring the use of monolithic crystals, which can reconstruct interaction positions within the crystal with a specific resolution.
+
+The Virtual Segmentation Digitizer module provides a mechanism to generate an ID based on a virtual segmentation of the monolithic crystal, aligned with its spatial resolution. Ideally, the pitch size should be at least half of the position resolution. This virtual segmentation occurs post-simulation, ensuring that the simulation speed remains uncompromised even when dealing with large systems and numerous crystals such as total-body PET scans.
+
+A GateTool associated with this digitizer allows users to create a new geometry macro with the segmented geometry, suitable for use in image reconstruction software.
+
+**Geometry Requirements:**
+
+To utilize this digitizer, the cylindricalPET geometry must be configured as follows:
+The size of the crystal should be defined at the Submodule level using Air as the material.
+The crystal and layer0 levels should both reflect the crystal size and use the crystal's material.
+This setup allows new virtual IDs for the XYZ axes to be assigned at the Layer, Crystal, and Submodule levels, respectively.
+
+Example::
+
+	# CRYSTAL
+	/gate/rsector/daughters/name crystal
+	/gate/rsector/daughters/insert box
+	/gate/crystal/geometry/setXLength 10. mm
+	/gate/crystal/geometry/setYLength 59. mm
+	/gate/crystal/geometry/setZLength 59. mm
+	/gate/crystal/setMaterial Air
+
+	# Level saved for the virtual COLUMN
+	/gate/crystal/daughters/name column
+	/gate/crystal/daughters/insert box
+	/gate/column/geometry/setXLength 10. mm
+	/gate/column/geometry/setYLength 59. mm
+	/gate/column/geometry/setZLength 59. mm
+	/gate/column/setMaterial Air
+
+
+	#Level saved for the virtual ROW
+	/gate/column/daughters/name row
+	/gate/column/daughters/insert box
+	/gate/row/geometry/setXLength 10. mm
+	/gate/row/geometry/setYLength 59. mm
+	/gate/row/geometry/setZLength 59. mm
+	/gate/row/setMaterial Air
+
+	#Level saved for the virtual Pseudo-Crystal (now the real material needs to be used)
+	/gate/row/daughters/name pseudo-crystal
+	/gate/row/daughters/insert box
+	/gate/pseudo-crystal/geometry/setXLength 10. mm
+	/gate/pseudo-crystal/geometry/setYLength 59. mm
+	/gate/pseudo-crystal/geometry/setZLength 59. mm
+	/gate/pseudo-crystal/setMaterial PWO
+
+
+**Commands**
+
+*"nameAxis"* Enable users to specify which axes require discretization. The axis selected can be any combination of "XYZ", "XY", "XZ" or "YZ", "X", "Y" or "Z".
+
+*"pitch, pitchX, pitchY, pitchZ"* allow users to specify the desired pitch size for all axis, or specific values for X,Y and Z axis. If no pitch size is provided, the digitizer will use the spatial resolution value to compute the optimal pitch size ensuring that the number of bins, defined as (crystal size)/(pitch), is integer. Note that the spatial resolution must be a single value for each axis; if a the spatial resolution is defined with a distribution and no pitch value is provided, the digitizer will not function correctly.
+
+*"useMacroGenerator"* boolean flag that determines if the user wants to generate the new geometry macro with the segmentation.
+
+
+
+
+Example providing spatial resolution::
+
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/insert                      		spatialResolution
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/spatialResolution/fwhm			2. mm
+
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/insert                       		virtualSegmentation
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/virtualSegmentation/nameAxis 		XYZ
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/virtualSegmentation/useMacroGenerator true
+
+In this case, a value for the FWHM for the spatial resolution was provided but no pitch size was given to the virtual segmentation. The module will read the value of spatial resolution and will generate a pitch size that is, at least, half of the value of the FWHM in spatial resolution.
+
+
+Example providing the pitch::
+
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/insert                       virtualSegmentation
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/virtualSegmentation/nameAxis XYZ
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/virtualSegmentation/pitch 1.0 mm
+/gate/digitizerMgr/<sensitive_detector>/SinglesDigitizer/Singles/virtualSegmentation/useMacroGenerator true
+
+In this case, the pitch size is provided by the user and it will be used regardless of any values of FWHM provided in the spatial resolution module.
+
+
+
+
+
+
+
+
+
+
+
 .. _digitizer_multiple_processor_chains-label:
 
 Examples of multiple Single Digitizers 
@@ -1765,4 +1866,5 @@ Finally, we call the 'triCoincProcessor' module and we plug on it the second sys
    /gate/digitizer/TriCoinc/triCoincProcessor/setSinglesPulseListName Singles_S1
    /gate/digitizer/TriCoinc/triCoincProcessor/setWindow 15 ns
    /gate/digitizer/TriCoinc/triCoincProcessor/setSinglesBufferSize 40
+
 
