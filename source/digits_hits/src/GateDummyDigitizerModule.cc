@@ -15,7 +15,7 @@
 
    - Create your DM by coping this class and GateDummyDigitizerMessenger class for your DM messenger
    - Places to change are marked with // ****** comment and called with "dummy" names
-   - Include your module to GateSinglesDigitizerMessenger in the method DoInsertion(..)
+   - Include your module to GateSinglesDigitizerMessenger.cc in the method DoInsertion(..)
 
 	If you adapting some already exiting class from Old Gate Digitizer here is some of the tips
 	- Digitize () is a fusion of GateVPulseProcessor::ProcessPulseList and GateXXX::ProcessOnePulse
@@ -28,7 +28,7 @@
   To create new Digitizer Module (DM), please, follow the steps:
   1) Copy .cc and .hh of GateDummyDigitizerModule, GateDummyDigitizerModuleMessenger to GateYourNewDigitizerModule and GateYourNewDigitizerModuleMessenger
   2) Replace in these new files : DummyDigitizerModule -> YourNewDigitizerModule
-  3) Compile 1st time (so not forget to redo ccmake to)
+  3) Compile 1st time (so not forget to redo ccmake too)
   4) Adapt GateYourNewDigitizerModuleMessenger.cc
   5) Adapt GateYourNewDigitizerModuleMessenger.hh (!!!! DO NOT FORGET TO WRITE A SHORT EXPLANATION ON WHAT DOES YOUR DM !!!!)
   6) Adapt GateYourNewDigitizerModule.hh
@@ -46,7 +46,7 @@
    	  	  inputPulse -> inputDigi
 	      outputPulse -> m_outputDigi + correct the first declaration (as in this Dummy module)
 	      outputPulseList.push_back(outputPulse) ->  m_OutputDigiCollection->insert(m_outputDigi);
-	10) Add YourDigitizerModule to GateSinglesDigitizer.cc
+	10) Add YourDigitizerModule to GateSinglesDigitizerMessenger
 			- #include "YourDigitizerModule.hh"
 			- in DumpMap() method in
 				static G4String theList = " ...."
