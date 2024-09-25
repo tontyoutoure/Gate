@@ -16,6 +16,7 @@ class G4UIcmdWithABool;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithoutParameter;
+class G4UIcmdWithAString;
 // class GateUIcmdWithADoubleWithUnitAndInteger;
 
 #include "GateUIcmdWithAVector.hh"
@@ -42,4 +43,6 @@ protected:
   G4UIcmdWithAnInteger *InitializeCmd;
   G4UIcmdWithADouble *SetActRatioCmd;
   G4UIcmdWithADouble *SetMaxSolidAngleCmd;
+  G4UIcmdWithAString *loadVoxelizedPhantomCmd;
+  G4UIcmdWith3VectorAndUnit* setPhantomPositionCmd;
 };

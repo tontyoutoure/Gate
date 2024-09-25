@@ -58,6 +58,16 @@ GateSourceTurboMessenger::GateSourceTurboMessenger(GateSourceTurbo *source)
   SetMaxSolidAngleCmd = new G4UIcmdWithADouble(cmdName, this);
   SetMaxSolidAngleCmd->SetGuidance("Set the maximum solid angle of the source.");
   SetMaxSolidAngleCmd->SetParameterName("maxSolidAngle", false);
+
+  cmdName = GetDirectoryName()+"loadVoxelizedPhantom";
+  loadVoxelizedPhantomCmd = new G4UIcmdWithAString(cmdName,this);
+  loadVoxelizedPhantomCmd->SetGuidance("Load a voxelized phantom from an image file.");
+  loadVoxelizedPhantomCmd->SetParameterName("vox_phantom", false);
+
+  cmdName = GetDirectoryName()+"setVoxelizedPhantomPosition";
+  setPhantomPositionCmd = new G4UIcmdWith3VectorAndUnit(cmdName,this);
+  setPhantomPositionCmd->SetGuidance("Set the position of the voxelized phantom.");
+  setPhantomPositionCmd->SetParameterName("pos_x", "pos_y", "pos_z", false);
 }
 
 GateSourceTurboMessenger::~GateSourceTurboMessenger() {
@@ -70,6 +80,8 @@ GateSourceTurboMessenger::~GateSourceTurboMessenger() {
   delete SetActRatioCmd;
   delete SetMaxSolidAngleCmd;
   delete InitializeCmd;
+  delete loadVoxelizedPhantomCmd;
+  delete setPhantomPositionCmd;
 }
 
 void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
@@ -93,7 +105,11 @@ void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
   else if (command == SetMaxSolidAngleCmd) {
     mSource->SetMaxSolidAngle(SetMaxSolidAngleCmd->GetNewDoubleValue(newValue));
   }
-  else if (command == InitializeCmd) {
+  else if (command == InitializeCmd) 
     mSource->Initialize(InitializeCmd->GetNewIntValue(newValue));
-  }  
+  else if (command == loadVoxelizedPhantomCmd)
+    mSource->LoadVoxelizedPhantom(newValue);
+  else if (command == setPhantomPositionCmd)
+    mSource->SetPhantomPosition(setPhantomPositionCmd->GetNew3VectorValue(newValue));
+  
 }

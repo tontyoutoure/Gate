@@ -41,6 +41,8 @@ public:
   void SetActRatio(G4double actRatio){act_ratio = actRatio;act_ratio_set = true;};
   void SetMaxSolidAngle(G4double maxSolidAngle) { max_solid_angle = maxSolidAngle; max_solid_angle_set = true; };
   void Initialize(G4int samplingCount);
+  void LoadVoxelizedPhantom(G4String filename);
+  void SetPhantomPosition(G4ThreeVector pos);
 
 private:
   void SetPhiTheta(const G4ThreeVector &pos) const;

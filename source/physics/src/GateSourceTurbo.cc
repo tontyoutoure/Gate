@@ -1,16 +1,8 @@
 #include "GateSourceTurbo.hh"
 #include "GateSourceTurboMessenger.hh"
 #include <G4Event.hh>
-#include <G4Exception.hh>
-#include <G4ExceptionSeverity.hh>
-#include <G4PrimaryVertex.hh>
-#include <G4ThreeVector.hh>
-#include <G4Transform3D.hh>
-#include <G4Vector3D.hh>
-#include <cmath>
-#include <math.h>
-#include "Randomize.hh"
-#include <iomanip>
+#include "GateVoxelizedPosDistribution.hh"
+
 G4int GateSourceTurbo::GeneratePrimaries(G4Event *event) {
   if (event)
     GateMessage("Beam", 2,
@@ -347,4 +339,24 @@ G4double GateSourceTurbo::GetNextTime(G4double timeStart) {
                << m_posSPS->GetCentreCoords().y()/mm << " "
                << m_posSPS->GetCentreCoords().z()/mm << Gateendl;*/
   return aTime;
+}
+
+
+void GateSourceTurbo::LoadVoxelizedPhantom(G4String filename)
+{
+  if(m_posSPS)
+    delete m_posSPS;
+  m_posSPS = new GateVoxelizedPosDistribution(filename);
+  m_angSPS->SetPosDistribution(m_posSPS);
+
+}
+
+void GateSourceTurbo::SetPhantomPosition(G4ThreeVector pos)
+{
+  GateVoxelizedPosDistribution* posDist = dynamic_cast<GateVoxelizedPosDistribution*>(m_posSPS);
+  if(posDist)
+    posDist->SetPosition(pos);
+  else
+    G4cout << "Can't use this command unless a voxelized phantom has already been loaded." << G4endl;
+
 }
