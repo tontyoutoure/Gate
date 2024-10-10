@@ -45,6 +45,7 @@ public:
   void SetPhantomPosition(G4ThreeVector pos);
 
 private:
+  static G4bool random_engine_initialized;
   void SetPhiTheta(const G4ThreeVector &pos) const;
   G4double GetSolidAngle(const G4ThreeVector &pos) const;
   G4bool CheckPosDirValid(const G4ThreeVector &pos,

@@ -2,6 +2,9 @@
 #include "GateSourceTurboMessenger.hh"
 #include <G4Event.hh>
 #include "GateVoxelizedPosDistribution.hh"
+#include "GateRandomEngine.hh"
+
+G4bool GateSourceTurbo::random_engine_initialized = false;
 
 G4int GateSourceTurbo::GeneratePrimaries(G4Event *event) {
   if (event)
@@ -128,6 +131,12 @@ G4double GateSourceTurbo::GetSolidAngle(const G4ThreeVector &pos) const {
 }
 
 void GateSourceTurbo::Initialize(G4int samplingCount) {
+  
+  GateRandomEngine* theRandomEngine = GateRandomEngine::GetInstance();
+  if (!random_engine_initialized) {
+    theRandomEngine->Initialize();
+    random_engine_initialized = true;
+  }
   if (a1 != a1 || a2 != a2 || b1 != b1 || b2 != b2 ||
       plane_distance != plane_distance || plane_phi != plane_phi) {
     G4Exception("GateSourceTurbo::SetActRatio", "SetActRatioError",
