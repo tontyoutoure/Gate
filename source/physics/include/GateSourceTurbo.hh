@@ -43,6 +43,7 @@ public:
   void Initialize(G4int samplingCount);
   void LoadVoxelizedPhantom(G4String filename);
   void SetPhantomPosition(G4ThreeVector pos);
+  void GetWindowVertex(G4ThreeVector &pos1, G4ThreeVector &pos2, G4ThreeVector &pos3, G4ThreeVector &pos4) const;
 
 private:
   static G4bool random_engine_initialized;

@@ -369,3 +369,18 @@ void GateSourceTurbo::SetPhantomPosition(G4ThreeVector pos)
     G4cout << "Can't use this command unless a voxelized phantom has already been loaded." << G4endl;
 
 }
+
+void GateSourceTurbo::GetWindowVertex(G4ThreeVector &pos1, G4ThreeVector &pos2, G4ThreeVector &pos3, G4ThreeVector &pos4) const {
+  pos1 = {plane_distance, a1, b1};
+  pos2 = {plane_distance, a1, b2};
+  pos3 = {plane_distance, a2, b1};
+  pos4 = {plane_distance, a2, b2};
+  //rotate with plane_phi
+  G4double s = sin_plane_phi;
+  G4double c = cos_plane_phi;
+  G4RotationMatrix rot({{c, s, 0}, {-s, c, 0}, {0, 0, 1}});
+  pos1 = rot * pos1;
+  pos2 = rot * pos2;
+  pos3 = rot * pos3;
+  pos4 = rot * pos4;
+}

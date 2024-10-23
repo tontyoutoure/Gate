@@ -4,6 +4,15 @@
 #include "GateSourceTurbo.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithADouble.hh"
+#include "G4UIcmdWithoutParameter.hh"
+#include "G4Polyline.hh"
+#include "G4VGraphicsScene.hh"
+#include "G4VModel.hh"
+#include "G4CallbackModel.hh"
+#include <G4Colour.hh>
+#include <string>
+#include <G4VisManager.hh>
+#include "G4UImanager.hh"
 
 GateSourceTurboMessenger::GateSourceTurboMessenger(GateSourceTurbo *source)
     : GateVSourceMessenger(source), mSource(source) {
@@ -68,6 +77,15 @@ GateSourceTurboMessenger::GateSourceTurboMessenger(GateSourceTurbo *source)
   setPhantomPositionCmd = new G4UIcmdWith3VectorAndUnit(cmdName,this);
   setPhantomPositionCmd->SetGuidance("Set the position of the voxelized phantom.");
   setPhantomPositionCmd->SetParameterName("pos_x", "pos_y", "pos_z", false);
+
+  cmdName = GetDirectoryName() + "visualizeWindow";
+  VisualizeWindowCmd = new G4UIcommand(cmdName, this);
+  VisualizeWindowCmd->SetGuidance("Visualize the output window of the source.");
+  G4UIparameter* parameter;
+  parameter = new G4UIparameter ("width", 'd', false);
+  VisualizeWindowCmd -> SetParameter (parameter);
+  parameter = new G4UIparameter ("colour", 's', false);
+  VisualizeWindowCmd -> SetParameter (parameter);
 }
 
 GateSourceTurboMessenger::~GateSourceTurboMessenger() {
@@ -82,6 +100,7 @@ GateSourceTurboMessenger::~GateSourceTurboMessenger() {
   delete InitializeCmd;
   delete loadVoxelizedPhantomCmd;
   delete setPhantomPositionCmd;
+  delete VisualizeWindowCmd;
 }
 
 void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
@@ -111,5 +130,64 @@ void GateSourceTurboMessenger::SetNewValue(G4UIcommand *command,
     mSource->LoadVoxelizedPhantom(newValue);
   else if (command == setPhantomPositionCmd)
     mSource->SetPhantomPosition(setPhantomPositionCmd->GetNew3VectorValue(newValue));
+  else if (command == VisualizeWindowCmd)
+    ViusalizeWindow(newValue);
+}
+
+GateSourceTurboMessenger::Window::Window(const G4Vector3D& pos1, const G4Vector3D& pos2, const G4Vector3D& pos3, const G4Vector3D& pos4, G4Colour colour, G4double width) {
+
+  fPolyline.push_back(pos1);
+  fPolyline.push_back(pos3);
+  fPolyline.push_back(pos4);
+  fPolyline.push_back(pos2);
+  fPolyline.push_back(pos1);
+  G4VisAttributes va;
+  va.SetLineWidth(width);
+  va.SetColour(colour);
+  fPolyline.SetVisAttributes(va);
+
+}
+
+
+void GateSourceTurboMessenger::Window::operator()
+  (G4VGraphicsScene &sceneHandler, const G4ModelingParameters *) {
+  sceneHandler.BeginPrimitives();
+  sceneHandler.AddPrimitive(fPolyline);
+  sceneHandler.EndPrimitives();
+}
+
+void GateSourceTurboMessenger::ViusalizeWindow(G4String newValue) const {
+  G4ThreeVector pos1, pos2, pos3, pos4;
+  mSource->GetWindowVertex(pos1, pos2, pos3, pos4);
+  // G4cout << "Window vertex 1: " << pos1 << G4endl;
+  // G4cout << "Window vertex 2: " << pos2 << G4endl;
+  // G4cout << "Window vertex 3: " << pos3 << G4endl;
+  // G4cout << "Window vertex 4: " << pos4 << G4endl;
+  G4double width = 2;
+  G4String colour_str = "red";
   
+  std::istringstream is(newValue);
+  is >> width >> colour_str;
+  G4Colour colour;
+  G4Colour::GetColour(colour_str, colour);
+
+
+  Window * window = new Window(pos1, pos2, pos3, pos4, colour, width);
+  G4cout << "viusalize window with" << newValue << G4endl;
+  G4VModel* model =
+    new G4CallbackModel<GateSourceTurboMessenger::Window>(window);
+  model->SetType("Turbo Window");
+  model->SetGlobalTag("Turbo Window");
+  G4String description = "Turbo Window: ";
+  description += "(" + std::to_string(pos1.x()) + " " + std::to_string(pos1.y()) + " " + std::to_string(pos1.z()) + "), ";
+  description += "(" + std::to_string(pos2.x()) + " " + std::to_string(pos2.y()) + " " + std::to_string(pos2.z()) + "), ";
+  description += "(" + std::to_string(pos3.x()) + " " + std::to_string(pos3.y()) + " " + std::to_string(pos3.z()) + "), ";
+  description += "(" + std::to_string(pos4.x()) + " " + std::to_string(pos4.y()) + " " + std::to_string(pos4.z()) + ")";
+  model->SetGlobalDescription(description);
+
+  G4VisManager* fpVisManager = G4VisManager::GetInstance();
+  G4Scene* pScene = fpVisManager->GetCurrentScene();
+  const G4String& currentSceneName = pScene -> GetName ();
+  G4bool successful = pScene -> AddRunDurationModel (model, true);
+  G4UImanager::GetUIpointer () -> ApplyCommand ("/vis/scene/notifyHandlers");
 }

@@ -4,6 +4,9 @@
 #include "GateMessenger.hh"
 #include "GateVSourceMessenger.hh"
 #include "globals.hh"
+#include <G4Colour.hh>
+#include <G4Vector3D.hh>
+#include <G4Polyline.hh>
 
 class GateVSource;
 
@@ -17,6 +20,8 @@ class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithoutParameter;
 class G4UIcmdWithAString;
+class G4VGraphicsScene;
+class G4ModelingParameters;
 // class GateUIcmdWithADoubleWithUnitAndInteger;
 
 #include "GateUIcmdWithAVector.hh"
@@ -25,6 +30,7 @@ class GateSourceTurbo;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 class GateSourceTurboMessenger : public GateVSourceMessenger {
+  void ViusalizeWindow(G4String newValue) const;
 public:
   GateSourceTurboMessenger(GateSourceTurbo *source);
   ~GateSourceTurboMessenger();
@@ -33,7 +39,7 @@ public:
 
 protected:
   GateSourceTurbo *mSource;
-
+  G4UIcommand *VisualizeWindowCmd;
   G4UIcmdWithADoubleAndUnit *SetPlaneDistanceCmd;
   G4UIcmdWithADoubleAndUnit *SetPlanePhiCmd;
   G4UIcmdWithADoubleAndUnit *SetA1Cmd;
@@ -45,4 +51,13 @@ protected:
   G4UIcmdWithADouble *SetMaxSolidAngleCmd;
   G4UIcmdWithAString *loadVoxelizedPhantomCmd;
   G4UIcmdWith3VectorAndUnit* setPhantomPositionCmd;
+  struct Window
+  {
+    Window(const G4Vector3D& pos1, const G4Vector3D& pos2, const G4Vector3D& pos3, const G4Vector3D& pos4, G4Colour colour, G4double width);
+    void operator()(G4VGraphicsScene&, const G4ModelingParameters*);
+    G4Polyline fPolyline;
+    G4Colour fColour;
+    G4double fWidth;
+  };
+
 };
