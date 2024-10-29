@@ -59,7 +59,7 @@ private:
   G4double plane_phi{NAN};
   G4double sin_plane_phi{NAN}, cos_plane_phi{NAN};
   G4double a1{NAN}, a2{NAN}, b1{NAN}, b2{NAN};
-
+  void VerifyPhiTheta(G4int number_pos, G4double interval) const;
   // G4ThreeVector mPth1;
   // G4ThreeVector mPth2;
   // G4ThreeVector mPphi1;
