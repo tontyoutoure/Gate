@@ -332,8 +332,12 @@ void GateVirtualSegmentationSD::SetVirtualID( int nBins, double pitch, G4double 
 
 
 	 bin = std::floor(pos/pitch+nBins/2.);
+	 if (bin == nBins)	bin -=1;
+	 if (bin < 0) 		bin = 0;
 	 m_outputDigi->SetOutputVolumeID(bin,depth);
 
+	 //std::cout<<"Pos at depth"<<depth<<" and nBins = "<<nBins<<" is = "<<pos<<" and the virtualID is = "<<bin<<std::endl;
+	 //if (bin == nBins) std::cout<<"Pos at depth"<<depth<<" and nBins = "<<nBins<<" is = "<<pos<<" and the virtualID is = "<<bin<<std::endl;
  }
 
 
@@ -551,7 +555,6 @@ void GateVirtualSegmentationSD::SetParameters()
 	       	}
 
 }
-
 
 
 
