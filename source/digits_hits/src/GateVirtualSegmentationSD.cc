@@ -332,8 +332,12 @@ void GateVirtualSegmentationSD::SetVirtualID( int nBins, double pitch, G4double 
 
 
 	 bin = std::floor(pos/pitch+nBins/2.);
+	 if (bin == nBins)	bin -=1;
+	 if (bin < 0) 		bin = 0;
 	 m_outputDigi->SetOutputVolumeID(bin,depth);
 
+	 //std::cout<<"Pos at depth"<<depth<<" and nBins = "<<nBins<<" is = "<<pos<<" and the virtualID is = "<<bin<<std::endl;
+	 //if (bin == nBins) std::cout<<"Pos at depth"<<depth<<" and nBins = "<<nBins<<" is = "<<pos<<" and the virtualID is = "<<bin<<std::endl;
  }
 
 
@@ -422,7 +426,7 @@ void GateVirtualSegmentationSD::SetParameters()
 
 
 
-				if(digi_SpatialResolution->GetFWHMxdistrib()||digi_SpatialResolution->GetFWHMydistrib()||digi_SpatialResolution->GetFWHMxydistrib2D())
+				if(digi_SpatialResolution->GetFWHMxdistrib()||digi_SpatialResolution->GetFWHMydistrib()||digi_SpatialResolution->GetFWHMXDistrib2D()||digi_SpatialResolution->GetFWHMYDistrib2D()||digi_SpatialResolution->GetFWHMZDistrib2D())
 				 {
 				 GateError("***ERROR*** No value of the target pitch has been provided and no value can be obtained from the spatial resolution distribution. /n Please provide a value for the pitch that is at least half of the minimum value of the distribution. ");
 				 }
@@ -551,7 +555,6 @@ void GateVirtualSegmentationSD::SetParameters()
 	       	}
 
 }
-
 
 
 

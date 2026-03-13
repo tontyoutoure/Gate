@@ -33,6 +33,7 @@ GateSpatialResolutionMessenger::GateSpatialResolutionMessenger (GateSpatialResol
 	spresolutionCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
 	spresolutionCmd->SetGuidance("Set the resolution (in mm) in position for gaussian spblurring");
 	spresolutionCmd->SetUnitCategory("Length");
+
 	cmdName = GetDirectoryName() + "fwhmX";
 	spresolutionXCmd= new G4UIcmdWithADoubleAndUnit(cmdName,this);
 	spresolutionXCmd->SetGuidance("Set the resolution (in mm) in position for gaussian spblurring");
@@ -45,33 +46,68 @@ GateSpatialResolutionMessenger::GateSpatialResolutionMessenger (GateSpatialResol
 	spresolutionZCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
 	spresolutionZCmd->SetGuidance("Set the resolution in position for gaussian spblurring");
 	spresolutionZCmd->SetUnitCategory("Length");
+
 	cmdName = GetDirectoryName() + "fwhmXdistrib";
 	spresolutionXdistribCmd = new G4UIcmdWithAString(cmdName,this);
 	spresolutionXdistribCmd->SetGuidance("Set the distribution  resolution in position for gaussian spblurring");
 	cmdName = GetDirectoryName() + "fwhmYdistrib";
 	spresolutionYdistribCmd = new G4UIcmdWithAString(cmdName,this);
 	spresolutionYdistribCmd->SetGuidance("Set the  distribution resolution in position for gaussian spblurring");
-	cmdName = GetDirectoryName() + "fwhmXYdistrib2D";
-	spresolutionXYdistrib2DCmd = new G4UIcmdWithAString(cmdName,this);
-	spresolutionXYdistrib2DCmd->SetGuidance("Set the distribution 2D of  spatial resolution in position for gaussian spblurring");
+	cmdName = GetDirectoryName() + "fwhmZdistrib";
+	spresolutionZdistribCmd = new G4UIcmdWithAString(cmdName,this);
+	spresolutionZdistribCmd->SetGuidance("Set the  distribution resolution in position for gaussian spblurring");
+
+	cmdName = GetDirectoryName() + "fwhmXDistrib2D";
+	spresolutionXDistrib2DCmd = new G4UIcmdWithAString(cmdName,this);
+	spresolutionXDistrib2DCmd->SetGuidance("Set the 2D distribution for X axis (expects a 2D distribution object)");
+	cmdName = GetDirectoryName() + "fwhmYDistrib2D";
+	spresolutionYDistrib2DCmd = new G4UIcmdWithAString(cmdName,this);
+	spresolutionYDistrib2DCmd->SetGuidance("Set the 2D distribution for Y axis (expects a 2D distribution object)");
+	cmdName = GetDirectoryName() + "fwhmZDistrib2D";
+	spresolutionZDistrib2DCmd = new G4UIcmdWithAString(cmdName,this);
+	spresolutionZDistrib2DCmd->SetGuidance("Set the 2D distribution for Z axis (expects a 2D distribution object)");
+
+
+	cmdName = GetDirectoryName()+"nameAxis";
+	nameAxisCmd = new G4UIcmdWithAString(cmdName,this);
+	nameAxisCmd ->SetGuidance("Provide the coordinate pair used by 2D distributions: 'XZ' or 'YZ'. Default is 'YZ'.");
+	nameAxisCmd ->SetCandidates("XZ YZ");
+
 
 	cmdName = GetDirectoryName() + "confineInsideOfSmallestElement";
     confineCmd = new G4UIcmdWithABool(cmdName,this);
     confineCmd->SetGuidance("To be set true, if you want to moves the outsiders of the crystal after spblurring inside the same crystal");
+
+    cmdName = GetDirectoryName() + "useTruncatedGaussian";
+    useTruncatedGaussianCmd = new G4UIcmdWithABool(cmdName,this);
+    useTruncatedGaussianCmd->SetGuidance("To be set true, if you want to use a truncated Gaussian distribution to keep the blurring within the same crystal");
 }
+
+
 
 
 GateSpatialResolutionMessenger::~GateSpatialResolutionMessenger()
 {
-	delete  spresolutionCmd;
-	delete  spresolutionXCmd;
-	delete  spresolutionXdistribCmd;
-	delete  spresolutionYdistribCmd;
-	delete  spresolutionXYdistrib2DCmd;
 
+	delete  spresolutionCmd;
+
+	delete  spresolutionXCmd;
 	delete  spresolutionYCmd;
 	delete  spresolutionZCmd;
+
+	delete  spresolutionXdistribCmd;
+	delete  spresolutionYdistribCmd;
+	delete  spresolutionZdistribCmd;
+
+	delete  spresolutionXDistrib2DCmd;
+	delete  spresolutionYDistrib2DCmd;
+	delete  spresolutionZDistrib2DCmd;
+
+	delete  nameAxisCmd;
+	
+
 	delete  confineCmd;
+	delete	useTruncatedGaussianCmd;
 
 }
 
@@ -90,11 +126,36 @@ void GateSpatialResolutionMessenger::SetNewValue(G4UIcommand * aCommand,G4String
   	 	{ GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
   		if (distrib)m_SpatialResolution->SetFWHMydistrib(distrib);
         }
-  		// Handle command for 2D XY-distribution resolution
-   else if (aCommand == spresolutionXYdistrib2DCmd)
-          {GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
-        if (distrib) m_SpatialResolution->SetFWHMxydistrib2D(distrib);
+   else if ( aCommand==spresolutionZdistribCmd )
+  	 	{ GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
+  		if (distrib)m_SpatialResolution->SetFWHMzdistrib(distrib);
         }
+  		// Handle command for 2D-distribution resolution
+
+   if (aCommand == nameAxisCmd)
+ 	     {
+ 		// Only accept the PET-relevant options
+ 		if (newValue == "XZ" || newValue == "YZ") {
+ 			m_SpatialResolution->SetNameAxis(newValue);
+ 		} else {
+ 			G4cout << "***ERROR*** GateSpatialResolution::SetNewValue: nameAxis must be 'XZ' or 'YZ'\n"<< G4endl;
+ 		}
+ 	     }
+	 else if (aCommand == spresolutionXDistrib2DCmd)
+						 {
+							 GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
+							 if (distrib) m_SpatialResolution->SetFWHMXDistrib2D(distrib);
+						 }
+	 else if (aCommand == spresolutionYDistrib2DCmd)
+						 {
+							 GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
+							 if (distrib) m_SpatialResolution->SetFWHMYDistrib2D(distrib);
+						 }
+	 else if (aCommand == spresolutionZDistrib2DCmd)
+						 {
+							 GateVDistribution* distrib = (GateVDistribution*)GateDistributionListManager::GetInstance()->FindElementByBaseName(newValue);
+							 if (distrib) m_SpatialResolution->SetFWHMZDistrib2D(distrib);
+						 }
 
    else if ( aCommand==spresolutionXCmd )
    		{ m_SpatialResolution->SetFWHMx(spresolutionXCmd->GetNewDoubleValue(newValue)); }
@@ -104,6 +165,8 @@ void GateSpatialResolutionMessenger::SetNewValue(G4UIcommand * aCommand,G4String
 		{ m_SpatialResolution->SetFWHMz(spresolutionZCmd->GetNewDoubleValue(newValue)); }
 	  else if ( aCommand==confineCmd )
 		{ m_SpatialResolution->ConfineInsideOfSmallestElement(confineCmd->GetNewBoolValue(newValue)); }
+	  else if ( aCommand==useTruncatedGaussianCmd )
+	  		{ m_SpatialResolution->SetUseTruncatedGaussian(useTruncatedGaussianCmd->GetNewBoolValue(newValue)); }
 	 else
 	    {
 	    	GateClockDependentMessenger::SetNewValue(aCommand,newValue);

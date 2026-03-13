@@ -98,8 +98,8 @@ STRING(REGEX REPLACE "(.*)[.](.*)[.](.*)" "\\3" G4VERSION_PATCH ${Geant4_VERSION
 #MESSAGE(${G4VERSION_MAJOR})
 #MESSAGE(${G4VERSION_MINOR})
 #MESSAGE(${G4VERSION_PATCH})
-IF(NOT ${G4VERSION_MAJOR}.${G4VERSION_MINOR} EQUAL 11.2)
-  MESSAGE("Warning! This GATE version is not validated for Geant4 ${G4VERSION_MAJOR}.${G4VERSION_MINOR} distribution. Please use Geant4 11.2 distribution instead.")
+IF(NOT ${G4VERSION_MAJOR}.${G4VERSION_MINOR} EQUAL 11.4.0)
+  MESSAGE("Warning! This GATE version is not validated for Geant4 ${G4VERSION_MAJOR}.${G4VERSION_MINOR} distribution. Please use Geant4 11.4.0 distribution instead.")
 ENDIF()
 
 #=========================================================
@@ -300,6 +300,7 @@ IF(GATE_COMPILE_GATEDIGIT)
     INSTALL(TARGETS Convert_CCMod2PETCoinc DESTINATION bin)
 ENDIF(GATE_COMPILE_GATEDIGIT)
 
+
 #=========================================================
 # We remove the warning option "shadow", because there are tons of
 # such warning related to clhep/g4 system of units.
@@ -312,14 +313,13 @@ MESSAGE("Your current Geant4 version is ${Geant4_VERSION}")
 
 #=========================================================
 # Display message about this version
-MESSAGE("IMPORTANT! This version of GATE (9.4) has still some traces of passage for new digitizer.")
+MESSAGE("IMPORTANT! This version of GATE (9.4.2) has still some traces of passage for new digitizer.")
 MESSAGE("Please, be aware that some of functionalities are NOT YET re-implemented: ")
-MESSAGE("- Coincidence digitizer modules (combining of several Coincidence Sorters)")
 MESSAGE("- Output: Sinogram, Ecat7, LMF")
 MESSAGE("- ARF may work not properly yet")
 MESSAGE("We apologize for this inconvenience and kindly ask for your patience.")
-MESSAGE("This functionalities will be added during 2024.")
-MESSAGE("Meanwhile, please, use Gate 9.3")
+MESSAGE("This functionalities will be added during 2025.")
+MESSAGE("Meanwhile, please, use Gate 9.2")
 
 
 

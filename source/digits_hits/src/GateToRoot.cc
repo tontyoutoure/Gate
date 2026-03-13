@@ -111,7 +111,8 @@ GateToRoot::GateToRoot(const G4String &name, GateOutputMgr *outputMgr, DigiMode 
       if (digiMode==kofflineMode)
       m_fileName="digigate";
     */
-	m_rootCCFlag=false;
+    m_rootCCFlag=false;
+    m_rootSpRes2DStdDevFlag=false;
     m_isEnabled = false; // Keep this flag false: all output are disabled by default
     nVerboseLevel = 0;
 
@@ -333,6 +334,7 @@ void GateToRoot::BookBeginOfRun() {
     for (size_t i = 0; i < m_outputChannelList.size(); ++i)
     {
     	 m_outputChannelList[i]->SetCCFlag(GetRootCCFlag());
+	 m_outputChannelList[i]->SetSpatialRes2DStdDevFlag(GetRootSpRes2DStdDevFlag());
         m_outputChannelList[i]->Book();
 
     }
@@ -1053,7 +1055,7 @@ void GateToRoot::RecordDigitizer(const G4Event *) {
     	if(m_outputChannelList[i]->m_collectionID<0)
     		m_outputChannelList[i]->m_collectionID=GetCollectionID(m_outputChannelList[i]->m_collectionName);
 
-    	//G4cout<<m_outputChannelList[i]->m_collectionName<<" "<< m_outputChannelList[i]->m_collectionID<<" "<< m_outputChannelList[i]->m_outputFlag<<G4endl;
+    	//G4cout<<"!!!! "<<m_outputChannelList[i]->m_collectionName<<" "<< m_outputChannelList[i]->m_collectionID<<" "<< m_outputChannelList[i]->m_outputFlag<<G4endl;
     	m_outputChannelList[i]->RecordDigitizer();
 
     }
@@ -1572,7 +1574,7 @@ void GateToRoot::OpenTracksFile() {
 
 void GateToRoot::RecordPHData(ComptonRayleighData aCRData) {
     theCRData.photon1_phantom_Rayleigh = aCRData.photon1_phantom_Rayleigh;
-    theCRData.photon2_phantom_Rayleigh = aCRData.photon1_phantom_Rayleigh;
+    theCRData.photon2_phantom_Rayleigh = aCRData.photon2_phantom_Rayleigh;
     theCRData.photon1_phantom_compton = aCRData.photon1_phantom_compton;
     theCRData.photon2_phantom_compton = aCRData.photon2_phantom_compton;
     strcpy(theCRData.theComptonVolumeName1, aCRData.theComptonVolumeName1);
@@ -1583,7 +1585,7 @@ void GateToRoot::RecordPHData(ComptonRayleighData aCRData) {
 
 void GateToRoot::GetPHData(ComptonRayleighData &aCRData) {
     aCRData.photon1_phantom_Rayleigh = theCRData.photon1_phantom_Rayleigh;
-    aCRData.photon2_phantom_Rayleigh = theCRData.photon1_phantom_Rayleigh;
+    aCRData.photon2_phantom_Rayleigh = theCRData.photon2_phantom_Rayleigh;
     aCRData.photon1_phantom_compton = theCRData.photon1_phantom_compton;
     aCRData.photon2_phantom_compton = theCRData.photon2_phantom_compton;
     strcpy(aCRData.theComptonVolumeName1, theCRData.theComptonVolumeName1);

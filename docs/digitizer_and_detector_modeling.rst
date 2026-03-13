@@ -512,7 +512,7 @@ or if resolution is varying for X, Y and Z::
    /gate/digitizerMgr/<detector_name>/SinglesDigitizer/<singles_digitizer_name>/spatialResolution/fwhmY 3.0 mm 
    /gate/digitizerMgr/<detector_name>/SinglesDigitizer/<singles_digitizer_name>/spatialResolution/fwhmZ 1.0 mm 
 
-In case if the position obtained after applying a Gaussian blurring exceeds the limits of the original volume, it is set to the surface of that volume (ex, crystal) or surface of a group of volumes (ex, block of crystals). For example, in SPECT the final position should be located within the original detector volume (smallest volume), in this case one should apply the following commande::
+In case if the position obtained after applying a Gaussian blurring exceeds the limits of the original volume, it is set to the surface of that volume (ex, crystal) or surface of a group of volumes (ex, block of crystals). For example, in SPECT the final position should be located within the original detector volume (smallest volume), in this case one should apply the following command::
 
    /gate/digitizerMgr/<detector_name>/SinglesDigitizer/<singles_digitizer_name>/spatialResolution/confineInsideOfSmallestElement true
 
@@ -524,9 +524,21 @@ BEWARE: This relocation procedure is validated only for the first group level of
    /gate/digitizerMgr/crystal/SinglesDigitizer/Singles/spatialResolution/fwhm 1.0 mm
    /gate/digitizerMgr/crystal/SinglesDigitizer/Singles/spatialResolution/confineInsideOfSmallestElement true 
 
+The option for a Gaussian distribution truncated at the crystal's edge has been introduced to preserve the standard deviation of the hits positioned close to the edge of the crystal. This option is particularly useful to confine elements in large crystals without compromising the standard deviation (and FWHM) of the spatial blurring.
+
+BEWARE: The confined and the use of the truncated Gaussian are default options. Use the following commands to activate or deactivate both options:
+
+**Example**::
+
+/gate/digitizerMgr/crystal/SinglesDigitizer/Singles/spatialResolution/confineInsideOfSmallestElement true 
+/gate/digitizerMgr/pseudoCrystal/SinglesDigitizer/Singles/spatialResolution/useTruncatedGaussian 		true
+
 **Configuring Spatial Resolution with 1D and 2D Distributions**::
 
-This approach is particularly essential  for  monolithic crystal detectors, where factors like edge effects and interaction positions significantly  may influence spatial  resolution.
+This approach is particularly essential  for  monolithic crystal detectors, where factors such as edge effects and interaction positions may significantly influence spatial resolution.
+
+In order to map the 2D distribution with the crystal, the command "nameAxis" is used. The value of the axis provided will be the ones attributed to the 2 dimensions (columns and rows) of the distribution file. Assuming the crystal will be placed along the Z direction the options are "XZ" for a ring starting on top, and "YZ" for a ring starting on the sides. The default value for "nameAxis" is "YZ".
+
 Here is an example of how to configure this in a macro file:
 
 **Example for 2D distribution**::
@@ -534,20 +546,21 @@ Here is an example of how to configure this in a macro file:
 
   /gate/distributions/name    my_distrib2D
   /gate/distributions/insert   File
-  /gate/distributions/my_distrib2D/setFileName    Lut(X,Y).txt
+  /gate/distributions/my_distrib2D/setFileName    Lut_XY.txt
   /gate/distributions/my_distrib2D/readMatrix2d
   /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
-  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmXYdistrib2D my_distrib2D
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/nameAxis       YZ
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmYdistrib2D my_distrib2D
+  /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmZdistrib2D my_distrib2D
+
 **Example for 1D distribution**::
 
   /gate/distributions/name   my_distrib1D
   /gate/distributions/insert  File
-  /gate/distributions/my_distrib1D/setFileName  macros/LutY.txt
+  /gate/distributions/my_distrib1D/setFileName  macros/Lut_Y.txt
   /gate/distributions/my_distrib1D/read
   /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/insert spatialResolution
   /gate/digitizerMgr/crystalUnit/SinglesDigitizer/Singles/spatialResolution/fwhmYdistrib my_distrib1D
-
-
 
 
 
@@ -561,10 +574,17 @@ BEWARE : The file for 2D Distribution  should be structured such that:
 
 **Example**::
 
--29.50 -28.50 -27.50 
--29.50 9.62 13.66 10.22
--28.50 11.38 11.18 10.23
--27.50 12.82 10.43 9.70
+
+  -30 -15 0 15 30
+  -15 9.31 7.25 6.22 7.31 9.73
+  0 9.42 6.25 3.25 6.22 9.72
+  15 9.42 6.53 3.15 6.32 9.71
+  30 9.42 7.45 6.25 7.32 9.74
+
+**IMPORTANT!** It is possible to keep the history of the spatial resolution for each Singles and Coincidences. It is availble for the moment only in ROOT output (:ref:`data_output_management.html#root-output`) with a command:: 
+
+  /gate/output/root/SpRes2DStdDevOutput 1
+
 
 Energy Framing
 ^^^^^^^^^^^^^^
@@ -1395,7 +1415,7 @@ To change the default value of the minimum sector difference for valid coinciden
 
 To change the default value of the maximum allowable difference in the z positions of two events (disabled by default), the command line should be used::
 
-  /gate/digitizer/Coincidences/setMaxDeltaZ <value_in_mm>
+  /gate/digitizer/Coincidences/setDeltaZMax <value_in_mm>
 
 For non-standard scanners, such as square-shaped ones, you can set the minimum allowable sector distance s between two events. This option provides more flexibility than the default minimum sector difference::
 
@@ -1521,7 +1541,6 @@ Here is an example of how to configure this in a macro file:
 
 **Example** ::
 
-
 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert buffer
 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setBufferSize 64 B
 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/buffer/setReadFrequency 10 MHz
@@ -1540,9 +1559,7 @@ A presort buffer contains singles that have not yet been checked for coincidence
 Multiple coincidence removal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 If the multiple coincidences are kept and not split into pairs (i.e., if any of the **keepXXX** multiple coincidence policies are used), the multicoincidences could contribute to dataflow occupancy but cannot be written to the disk. Unless otherwise specified, any multicoincidence is then cleared from data just before the disk writing. If needed, this clearing could be performed at any earlier coincidence processing step by inserting the **multiplesKiller** module at the required level. This module has no parameters and simply removes the multicoincidence events. Multiple coincidences split into many pairs are not affected by this module and cannot be distinguished from normal "simple" coincidences. To insert a multipleKiller, use the syntax ::
-
 
 /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert multiplesKiller
 
@@ -1553,7 +1570,10 @@ Coincidence Time Difference Selector
 
 This module reprocesses the list of coincidences and applies a cut on the time difference between two Singles forming the coincidence, i. e. appalling a cut tighter than coincidence time window selected by coincidence sorter.
 
+
+
 **Example** ::
+
 
   /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/insert timeDiffSelector
   /gate/digitizerMgr/CoincidenceDigitizer/finalCoinc/timeDiffSelector/setMin 1 ns

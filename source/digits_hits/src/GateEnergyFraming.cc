@@ -93,7 +93,7 @@ void GateEnergyFraming::Digitize()
 		  {
 	  	      G4double energy = 0;
 		      inputDigi=(*IDC)[i];
-		      GateDigi* m_outputDigi = new GateDigi(*inputDigi);
+		      m_outputDigi = new GateDigi(*inputDigi);
 		       	
 		      if( m_EnergyFramingLaw != 0 ){
 
@@ -120,8 +120,8 @@ void GateEnergyFraming::Digitize()
 				  G4cout << "[GateEnergyFraming::Digitize]Ignored digi with energy above uphold:\n"
 				  << *inputDigi << Gateendl << Gateendl ;
 				  
-			  else
-			  	delete m_outputDigi;	  
+	          delete m_outputDigi;
+	          m_outputDigi = nullptr;
 		      }
 
 		  }

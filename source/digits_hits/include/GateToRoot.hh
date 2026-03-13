@@ -157,13 +157,15 @@ public:
     //--------------------------------------------------------------------------
     class VOutputChannel {
     public:
-        inline VOutputChannel(const G4String &aCollectionName, G4bool outputFlag, G4bool CCFlag)
+      inline VOutputChannel(const G4String &aCollectionName, G4bool outputFlag, G4bool CCFlag, G4bool SpatialRes2DStdDevFlag )
                 : nVerboseLevel(0),
                   m_outputFlag(outputFlag),
 				  m_CCFlag(CCFlag),
+		  m_SpatialRes2DStdDevFlag(SpatialRes2DStdDevFlag),
                   m_collectionName(aCollectionName),
                   m_collectionID(-1),
-				  m_signlesCommands(0){}
+				  m_singlesCommands(0),
+				  m_coinsCommands(0){}
 
         virtual inline ~VOutputChannel() {}
 
@@ -178,9 +180,15 @@ public:
         inline void SetCCFlag(G4bool val){m_CCFlag=val;};
         inline G4bool GetCCFlag(){return m_CCFlag;};
 
+        inline void SetSpatialRes2DStdDevFlag (G4bool val) {m_SpatialRes2DStdDevFlag=val;}
+        inline G4bool GetSpatialRes2DStdDevFlag () {return m_SpatialRes2DStdDevFlag;}
+        G4bool m_SpatialRes2DStdDevFlag;
+     
+      
 
-        inline void AddSinglesCommand() { m_signlesCommands++; };
+        inline void AddSinglesCommand() { m_singlesCommands++; };
 
+        inline void AddCoincidencesCommand() { m_coinsCommands++; };
 
         inline void SetVerboseLevel(G4int val) { nVerboseLevel = val; };
 
@@ -190,7 +198,8 @@ public:
 
         G4String m_collectionName;
         G4int m_collectionID;
-        G4int m_signlesCommands;
+        G4int m_singlesCommands;
+        G4int m_coinsCommands;
 
     };
 
@@ -199,7 +208,7 @@ public:
     class SingleOutputChannel : public VOutputChannel {
     public:
         inline SingleOutputChannel(const G4String &aCollectionName, G4bool outputFlag)
-                : VOutputChannel(aCollectionName, outputFlag, false),
+	  : VOutputChannel(aCollectionName, outputFlag, false, false),
                   m_tree(0)
         		{ m_buffer.Clear();     			}
 
@@ -218,7 +227,7 @@ public:
             	if( digitizerMgr->m_SDlist.size()==1 )
             	{
 
-            		if(m_signlesCommands==0)
+            		if(m_singlesCommands==0)
             		{
 
             			treeName = m_collectionName.substr(0, m_collectionName.find("_"));
@@ -234,10 +243,11 @@ public:
             	if(runID>0)
             		treeName = treeName+"_run"+std::to_string(runID);
 
-
+            	//G4cout<<"!!!! "<< runID <<" "<<treeName<<G4endl;
             	m_tree = new GateSingleTree(treeName);
 
             	m_buffer.SetCCFlag(GetCCFlag());
+		m_buffer.SetSpatialRes2DStdDevFlag(GetSpatialRes2DStdDevFlag());
             	m_tree->Init(m_buffer);
             }
         }
@@ -253,7 +263,7 @@ public:
     class CoincidenceOutputChannel : public VOutputChannel {
     public:
         inline CoincidenceOutputChannel(const G4String &aCollectionName, G4bool outputFlag)
-                : VOutputChannel(aCollectionName, outputFlag, false),
+	  : VOutputChannel(aCollectionName, outputFlag, false, false),
                   m_tree(0) { m_buffer.Clear(); }
 
         virtual inline ~CoincidenceOutputChannel() {}
@@ -262,8 +272,34 @@ public:
 
         inline void Book() {
         	 m_collectionID = -1;
-            if (m_outputFlag) {
-                m_tree = new GateCoincTree(m_collectionName);
+
+        	 //OK GND 2024 multiSD backward compatibility
+        	 GateDigitizerMgr* digitizerMgr = GateDigitizerMgr::GetInstance();
+
+        	 if (m_outputFlag) {
+        		 G4String treeName;
+
+        		 if( digitizerMgr->m_SDlist.size()==1 )
+        		 {
+
+        			 if(m_coinsCommands==0)
+        			 {
+
+        				 treeName = m_collectionName.substr(0, m_collectionName.find("_"));
+
+        			 }
+        			 else
+        		 	 	 treeName = m_collectionName;
+        		 }
+        		 else
+        			 treeName = m_collectionName;
+
+        	 	 G4int runID=GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+        	 	 if(runID>0)
+        	 		 treeName = treeName+"_run"+std::to_string(runID);
+
+                m_tree = new GateCoincTree(treeName);
+		m_buffer.SetSpatialRes2DStdDevFlag(GetSpatialRes2DStdDevFlag());
                 m_tree->Init(m_buffer);
             }
         }
@@ -286,6 +322,9 @@ public:
 
     void SetRootHitFlag(G4bool flag) { m_rootHitFlag = flag; };
 
+    void SetRootSpRes2DStdDevFlag(G4bool flag) { m_rootSpRes2DStdDevFlag = flag; };
+    G4bool GetRootSpRes2DStdDevFlag() {return  m_rootSpRes2DStdDevFlag; };
+  
     void SetRootCCFlag(G4bool flag) { m_rootCCFlag = flag; };
     G4bool GetRootCCFlag() {return  m_rootCCFlag; };
 
@@ -394,6 +433,7 @@ private:
 // v. cuplov - optical photons
 
     G4bool m_rootHitFlag;
+    G4bool m_rootSpRes2DStdDevFlag;
     G4bool m_rootCCFlag;
     G4bool m_rootCCSourceParentIDSpecificationFlag;
     G4bool m_rootNtupleFlag;

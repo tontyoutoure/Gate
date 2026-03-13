@@ -13,7 +13,6 @@ See LICENSE.md for further details
 
 
 #include "GateToRootMessenger.hh"
-
 #ifdef G4ANALYSIS_USE_ROOT
 
 #include "GateToRoot.hh"
@@ -69,6 +68,10 @@ GateToRootMessenger::GateToRootMessenger(GateToRoot* gateToRoot)
   RootCCCmd->SetGuidance("Set the flag for Hits in case of CC ROOT output");
  // RootCCCmd->SetGuidance("1. true/false");
 
+  
+  cmdName = GetDirectoryName()+"SpRes2DStdDevOutput";
+  RootSpRes2DStdDevCmd = new G4UIcmdWithABool(cmdName,this);
+  RootSpRes2DStdDevCmd->SetGuidance("Set the flag for Hits in case of SpRes2DStdDev ROOT output");
 
   cmdName = GetDirectoryName()+"CCoutput/specifysourceParentID";
   RootCCSourceParentIDSpecificationCmd = new G4UIcmdWithABool(cmdName,this);
@@ -135,6 +138,8 @@ GateToRootMessenger::~GateToRootMessenger()
   delete RootSinglesCmd;
   delete RootCoincidencesCmd;
 
+  delete  RootSpRes2DStdDevCmd;
+  
   delete RootCCCmd;
   delete RootCCSourceParentIDSpecificationCmd;
   delete RootHitCmd;
@@ -164,6 +169,11 @@ void GateToRootMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   } else if (command == RootHitCmd) {
     m_gateToRoot->SetRootHitFlag(RootHitCmd->GetNewBoolValue(newValue));
   }
+ 
+    else if (command == RootSpRes2DStdDevCmd) {
+        m_gateToRoot->SetRootSpRes2DStdDevFlag(RootSpRes2DStdDevCmd->GetNewBoolValue(newValue));
+    }
+  
     else if (command == RootCCCmd) {
         m_gateToRoot->SetRootCCFlag(RootCCCmd->GetNewBoolValue(newValue));
 
@@ -230,7 +240,7 @@ void GateToRootMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
     				 }
 
     				 digitizerMgr->m_recordCoincidences= RootCoincidencesCmd->GetNewBoolValue(newValue);
-
+ 
 
   }	  else if (command == SaveRndmCmd){
     m_gateToRoot->SetSaveRndmFlag(SaveRndmCmd->GetNewBoolValue(newValue));
@@ -339,7 +349,7 @@ void GateToRootMessenger::ExecuteOutputChannelCmd(G4UIcommand* command, G4String
     	  digitizer->m_recordFlag=true;
 
       //Setting flag in the digitizerMgr
-      //G4cout<<"ExecuteOutputChannelCmd "<<m_outputChannelList[i]->m_collectionName<<G4endl;
+      G4cout<<"ExecuteOutputChannelCmd "<<m_outputChannelList[i]->m_collectionName<<G4endl;
       if (G4StrUtil::contains(m_outputChannelList[i]->m_collectionName, "Singles"))
       {
     	  m_outputChannelList[i]->AddSinglesCommand();
@@ -348,6 +358,8 @@ void GateToRootMessenger::ExecuteOutputChannelCmd(G4UIcommand* command, G4String
       }
       if (G4StrUtil::contains(m_outputChannelList[i]->m_collectionName, "Coincidences"))
       {
+    	  m_outputChannelList[i]->AddCoincidencesCommand();
+    	  if(OutputChannelCmdList[i]->GetNewBoolValue(newValue))
     		  digitizerMgr->m_recordCoincidences=OutputChannelCmdList[i]->GetNewBoolValue(newValue);
       }
 
